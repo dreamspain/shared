@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TIE Hoy · App Promo Standard · Classic v4 · Articulated</title>
+<style>
+:root{
+  --paper:#FCFBF8;--ink:#242321;--body:#575451;--muted:#8A8680;
+  --seal:#8A3F31;--hair:#D8D5CF;--wash:#F7F5F0;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Arial,sans-serif;
+  --serif:Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#efede9;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.stage{width:402px;min-height:874px;margin:0 auto;background:var(--paper);overflow:hidden}
+.page{padding:0 22px 48px}
+
+/* Context only: demonstrates the signature block in a real TIE flow. */
+.context{height:112px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);display:grid;grid-template-columns:1fr 1fr 1.35fr;align-items:center}
+.context .stat:nth-child(2){text-align:center}.context .stat:last-child{text-align:right}
+.num{font:400 36px/.95 var(--serif);letter-spacing:-.04em}.num small{font:400 19px/1 var(--serif);color:var(--muted)}
+.label{margin-top:9px;font:600 10px/1.45 var(--sans);letter-spacing:.10em;color:var(--muted)}
+.date{font:italic 400 31px/1 var(--serif);color:#009d68}
+
+/* ==========================================================
+   tieapppromostandard · CLASSIC v4 · ARTICULATED
+   One boundary, three planes: identity → capability → action.
+   ========================================================== */
+.tie-app-promo{
+  position:relative;
+  margin:32px 0 0;
+  padding:30px 0 27px 25px;
+  border-bottom:1px solid var(--hair);
+}
+/* The left seal is the ONLY opening rule. No duplicated top hairline. */
+.tie-app-promo::before{
+  content:"";
+  position:absolute;
+  left:0;top:30px;height:48px;
+  width:2px;background:var(--seal);
+}
+.tie-app-promo__brand{
+  margin:0 0 24px;
+}
+.tie-app-promo__eyebrow{
+  display:block;
+  margin:0 0 7px;
+  font:600 9px/1 var(--sans);
+  letter-spacing:.18em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+.tie-app-promo__name{
+  margin:0;
+  font:400 48px/.88 var(--serif);
+  letter-spacing:-.052em;
+  color:var(--ink);
+}
+.tie-app-promo__name em{
+  font-weight:400;font-style:italic;color:var(--seal);
+}
+.tie-app-promo__promise{
+  margin:0;
+  padding-left:1px;
+  font:400 19px/1.48 var(--serif);
+  letter-spacing:-.012em;
+  color:var(--body);
+}
+.tie-app-promo__promise span{display:block}
+.tie-app-promo__promise span:nth-child(1){color:#706c67}
+.tie-app-promo__promise span:nth-child(2){color:#4f4b47}
+.tie-app-promo__promise span:nth-child(3){
+  margin-top:2px;
+  color:var(--ink);
+  font-size:21px;
+}
+.tie-app-promo__action{
+  display:inline-grid;
+  grid-template-columns:24px auto 20px;
+  align-items:center;
+  column-gap:9px;
+  margin-top:23px;
+  min-height:44px;
+  color:var(--seal);
+  text-decoration:none;
+  font:400 17px/1 var(--serif);
+}
+.tie-app-promo__apple{font:400 21px/1 var(--sans)}
+.tie-app-promo__arrow{
+  font:400 20px/1 var(--serif);
+  transition:transform .18s ease;
+}
+.tie-app-promo__action:hover .tie-app-promo__arrow,
+.tie-app-promo__action:focus-visible .tie-app-promo__arrow{transform:translateX(3px)}
+.tie-app-promo__action:focus-visible{outline:2px solid var(--seal);outline-offset:5px}
+
+/* Context only */
+.form{padding-top:28px}
+.field{position:relative;padding-left:34px;padding-bottom:21px;margin-bottom:20px;border-bottom:1px solid #e2ded8}
+.roman{position:absolute;left:0;top:31px;font:italic 400 17px/1 var(--serif);color:var(--seal)}
+.field label{display:block;font:600 11px/1.45 var(--sans);letter-spacing:.10em;color:var(--seal);margin-bottom:12px}
+.control{font-size:18px;line-height:1.25;padding-bottom:3px;border-bottom:1px solid #99928c;min-height:37px;display:flex;align-items:center;justify-content:space-between}
+.chev{color:var(--seal);font-size:20px}
+@media(max-width:401px){.stage{width:100vw}}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="page">
+    <section class="context" aria-label="Contexto de ejemplo">
+      <div class="stat"><div class="num">20 <small>/ 154</small></div><div class="label">OFICINAS</div></div>
+      <div class="stat"><div class="num">48</div><div class="label">PROVINCIAS</div></div>
+      <div class="stat"><div class="date">29/09/2026</div></div>
+    </section>
+
+    <aside class="tie-app-promo" aria-label="TIE Hoy app">
+      <div class="tie-app-promo__brand">
+        <span class="tie-app-promo__eyebrow">La app</span>
+        <h2 class="tie-app-promo__name">TIE <em>Hoy</em></h2>
+      </div>
+
+      <p class="tie-app-promo__promise">
+        <span>Consulta tu lote.</span>
+        <span>Sigue tu oficina.</span>
+        <span>Recibe el aviso cuando avance.</span>
+      </p>
+
+      <a class="tie-app-promo__action" href="#" aria-label="Abrir TIE Hoy">
+        <span class="tie-app-promo__apple" aria-hidden="true"></span>
+        <span>Abrir TIE Hoy</span>
+        <span class="tie-app-promo__arrow" aria-hidden="true">→</span>
+      </a>
+    </aside>
+
+    <section class="form" aria-label="Consulta gratuita">
+      <div class="field"><i class="roman">I</i><label>PROVINCIA</label><div class="control">Badajoz (5)<span class="chev">⌄</span></div></div>
+      <div class="field"><i class="roman">II</i><label>OFICINA</label><div class="control">CNP Don Benito · Avenida De Cordoba<span class="chev">⌄</span></div></div>
+      <div class="field"><i class="roman">III</i><label>TU LOTE</label><div class="control">255</div></div>
+    </section>
+  </div>
+</main>
+</body>
+</html>
