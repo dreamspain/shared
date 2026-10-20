@@ -18,8 +18,12 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "tsc -p tsconfig.json",
+    "check:dist": "npm run build && git diff --exit-code -- dist",
     "test": "npm run build && node --test test/*.test.mjs",
     "pack:check": "npm pack --dry-run"
+  },
+  "devDependencies": {
+    "typescript": "5.7.3"
   },
   "license": "UNLICENSED",
   "engines": {

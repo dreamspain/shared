@@ -1,16 +1,27 @@
 /** Dependency-free public route identity contract for TIEHoy. */
 
-export const LOCALES = ["en", "es", "fr", "ru", "zh", "ar"] as const;
+/** Freeze nested registry data so consumers cannot alter routing behavior at runtime. */
+function deepFreeze<T>(value: T): T {
+  if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
+    for (const key of Reflect.ownKeys(value)) {
+      deepFreeze((value as Record<PropertyKey, unknown>)[key]);
+    }
+    Object.freeze(value);
+  }
+  return value;
+}
+
+export const LOCALES = deepFreeze(["en", "es", "fr", "ru", "zh", "ar"] as const);
 export type Locale = (typeof LOCALES)[number];
 
-export const ROUTE_IDS = [
+export const ROUTE_IDS = deepFreeze([
   "home", "lote", "loteCheck", "loteNotify", "loteNotifyConfirmed",
   "citaPrevia", "citaPreviaAll", "citaPreviaBook", "citaPreviaProvince", "citaPreviaOffice",
   "pausedOffices", "topicsIndex", "hubTieCardRenewal", "hubResidenceRenewal",
   "hubFamilyReunification", "hubInvitationLetter", "guidesIndex", "guideDetail",
   "invitesIndex", "inviteDetail", "mentorsIndex", "lifeIndex", "lifeHave", "lifeNeed",
   "mentorTiger", "privacy", "cookies", "terms", "legalNotice", "construction",
-] as const;
+] as const);
 export type RouteId = (typeof ROUTE_IDS)[number];
 
 export interface RouteDefinition {
@@ -32,20 +43,45 @@ export interface RouteDefinition {
   readonly deepLink: boolean;
 }
 
-export interface LegacyRoute {
-  readonly pattern: string;
-  readonly action: "redirect" | "gone" | "notFound";
-  readonly to?: RouteId;
-  readonly status: 301 | 404 | 410;
+export interface LegacyNotFoundRoute {
+  readonly match: "exact" | "prefix";
+  readonly path: string;
+  readonly action: "notFound";
+  readonly status: 404;
 }
+
+export interface LegacyGoneRoute {
+  readonly match: "exact" | "prefix";
+  readonly path: string;
+  readonly action: "gone";
+  readonly status: 410;
+}
+
+export interface LegacyRedirectRoute {
+  readonly match: "exact" | "prefix";
+  readonly path: string;
+  readonly action: "redirect";
+  readonly status: 301;
+  /** Route identity used to compute the canonical redirect target. */
+  readonly to: RouteId;
+  /** Locale used to compute the canonical redirect target. */
+  readonly locale: Locale;
+}
+
+/** A historical path policy with explicit matching and HTTP semantics. */
+export type LegacyRoute = LegacyNotFoundRoute | LegacyGoneRoute | LegacyRedirectRoute;
+
+export type LegacyPathResolution =
+  | Readonly<{ action: "notFound"; status: 404 }>
+  | Readonly<{ action: "gone"; status: 410 }>
+  | Readonly<{ action: "redirect"; status: 301; targetPath: string }>;
 
 export const TIEHOY_ORIGIN = "https://tiehoy.com";
 export const SCLT_ORIGIN = "https://sclt.es";
 
 const ALL_LOCALES: readonly Locale[] = LOCALES;
-const EN_ES: readonly Locale[] = ["en", "es"];
 
-export const ROUTES: Readonly<Record<RouteId, RouteDefinition>> = {
+export const ROUTES: Readonly<Record<RouteId, RouteDefinition>> = deepFreeze({
   home: { id: "home", kind: "static", slug: "", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", scltSlug: "tie", deepLink: false },
   lote: { id: "lote", kind: "static", slug: "lote", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: true },
   loteCheck: { id: "loteCheck", kind: "static", slug: "lote/check", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", scltSlug: "tie/consultar", deepLink: true },
@@ -71,20 +107,36 @@ export const ROUTES: Readonly<Record<RouteId, RouteDefinition>> = {
   lifeHave: { id: "lifeHave", kind: "static", slug: "life/have", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
   lifeNeed: { id: "lifeNeed", kind: "static", slug: "life/need", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
   mentorTiger: { id: "mentorTiger", kind: "static", slug: "mentors/tiger", defaultLocale: "zh", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
-  privacy: { id: "privacy", kind: "static", slug: "privacy", activeLocales: EN_ES, indexability: "indexable", sitemap: "static", deepLink: false },
-  cookies: { id: "cookies", kind: "static", slug: "cookies", activeLocales: EN_ES, indexability: "indexable", sitemap: "static", deepLink: false },
-  terms: { id: "terms", kind: "static", slug: "terms", activeLocales: EN_ES, indexability: "indexable", sitemap: "static", deepLink: false },
-  legalNotice: { id: "legalNotice", kind: "static", slug: "legal-notice", activeLocales: EN_ES, indexability: "indexable", sitemap: "static", deepLink: false },
+  privacy: { id: "privacy", kind: "static", slug: "privacy", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
+  cookies: { id: "cookies", kind: "static", slug: "cookies", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
+  terms: { id: "terms", kind: "static", slug: "terms", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
+  legalNotice: { id: "legalNotice", kind: "static", slug: "legal-notice", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
   construction: { id: "construction", kind: "static", slug: "construction", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
-};
+});
 
-/** Retired aliases deliberately remain direct 404s; they must not be revived implicitly. */
-export const LEGACY_ROUTES: readonly LegacyRoute[] = [
-  { pattern: "/tie/*", action: "notFound", status: 404 },
-  { pattern: "/oficina/*", action: "notFound", status: 404 },
-  { pattern: "/oficinas/*", action: "notFound", status: 404 },
-  { pattern: "/office/*", action: "notFound", status: 404 },
-];
+/**
+ * Current historical path behavior from the Worker. `match` is deliberately
+ * explicit: exact entries do not accept a slash variant, and prefix entries
+ * include their required trailing slash. These are pathname-only policies.
+ */
+export const LEGACY_ROUTES: readonly LegacyRoute[] = deepFreeze([
+  { match: "prefix", path: "/tie/", action: "notFound", status: 404 },
+  { match: "prefix", path: "/oficina/", action: "notFound", status: 404 },
+  { match: "prefix", path: "/oficinas/", action: "notFound", status: 404 },
+  { match: "prefix", path: "/office/", action: "notFound", status: 404 },
+  { match: "exact", path: "/residence-renewal", action: "gone", status: 410 },
+  { match: "exact", path: "/es/renovacion-residencia", action: "gone", status: 410 },
+  { match: "exact", path: "/renewal", action: "gone", status: 410 },
+  { match: "exact", path: "/es/renovacion", action: "gone", status: 410 },
+  { match: "exact", path: "/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "zh" },
+  { match: "exact", path: "/en/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "en" },
+  { match: "exact", path: "/es/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "es" },
+  { match: "exact", path: "/fr/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "fr" },
+  { match: "exact", path: "/ru/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "ru" },
+  { match: "exact", path: "/zh/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "zh" },
+  { match: "exact", path: "/ar/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "ar" },
+  { match: "exact", path: "/zh/mentors/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "zh" },
+]);
 
 const RAW_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -138,6 +190,26 @@ export function pathFor(id: RouteId | string, locale: Locale | string, params?: 
   assertActiveLocale(route, locale);
   assertParams(route, params);
   return pathFromSlug(route, locale, params);
+}
+
+/**
+ * Resolve only a raw URL pathname against documented legacy behavior.
+ * This function does not add or remove a slash and rejects query/fragment
+ * input. A Worker adapter must preserve an incoming query when it constructs
+ * a redirect URL from `targetPath`.
+ */
+export function resolveLegacyPath(pathname: string): LegacyPathResolution | null {
+  if (typeof pathname !== "string" || !pathname.startsWith("/") || /[?#]/.test(pathname)) return null;
+  for (const legacy of LEGACY_ROUTES) {
+    const matches = legacy.match === "exact" ? pathname === legacy.path : pathname.startsWith(legacy.path);
+    if (!matches) continue;
+    if (legacy.action === "redirect") {
+      return deepFreeze({ action: "redirect" as const, status: 301 as const, targetPath: pathFor(legacy.to, legacy.locale) });
+    }
+    if (legacy.action === "gone") return deepFreeze({ action: "gone" as const, status: 410 as const });
+    return deepFreeze({ action: "notFound" as const, status: 404 as const });
+  }
+  return null;
 }
 
 export function canonicalFor(id: RouteId | string, locale: Locale | string, params?: Readonly<Record<string, string>>): string {
@@ -222,26 +294,26 @@ export function matchRoute(path: string): RouteMatch | null {
           else params[expected.slice(1)] = actual;
         } else if (actual !== expected) matches = false;
       }
-      if (matches) return { route, locale, params };
+      if (matches) return deepFreeze({ route, locale, params });
     }
   }
   return null;
 }
 
 export function sitemapRoutes(): RouteDefinition[] {
-  return Object.values(ROUTES).filter((route) => route.sitemap !== "never");
+  return deepFreeze(Object.values(ROUTES).filter((route) => route.sitemap !== "never"));
 }
 export function sitemapStaticRoutes(): RouteDefinition[] {
-  return Object.values(ROUTES).filter((route) => route.sitemap === "static");
+  return deepFreeze(Object.values(ROUTES).filter((route) => route.sitemap === "static"));
 }
 export function sitemapEntityRoutes(): RouteDefinition[] {
-  return Object.values(ROUTES).filter((route) => route.sitemap === "entity");
+  return deepFreeze(Object.values(ROUTES).filter((route) => route.sitemap === "entity"));
 }
 export function deepLinkRoutes(): RouteDefinition[] {
-  return Object.values(ROUTES).filter((route) => route.deepLink);
+  return deepFreeze(Object.values(ROUTES).filter((route) => route.deepLink));
 }
 export function hubRoutes(): RouteDefinition[] {
-  return Object.values(ROUTES).filter((route) => route.id.startsWith("hub"));
+  return deepFreeze(Object.values(ROUTES).filter((route) => route.id.startsWith("hub")));
 }
 
 export function validateManifest(): string[] {
@@ -268,11 +340,17 @@ export function validateManifest(): string[] {
   }
   for (const key of Object.keys(ROUTES)) if (!ROUTE_IDS.includes(key as RouteId)) errors.push(`ROUTES contains undeclared route ${JSON.stringify(key)}`);
   for (const legacy of LEGACY_ROUTES) {
-    if (!legacy.pattern.startsWith("/")) errors.push(`Legacy pattern ${JSON.stringify(legacy.pattern)} must start with /`);
-    if (legacy.action === "redirect" && (!legacy.to || legacy.status !== 301)) errors.push(`Legacy redirect ${JSON.stringify(legacy.pattern)} must have a 301 target`);
-    if (legacy.action === "gone" && legacy.status !== 410) errors.push(`Legacy gone route ${JSON.stringify(legacy.pattern)} must have status 410`);
-    if (legacy.action === "notFound" && legacy.status !== 404) errors.push(`Legacy notFound route ${JSON.stringify(legacy.pattern)} must have status 404`);
-    if (legacy.to && !ROUTES[legacy.to]) errors.push(`Legacy route ${JSON.stringify(legacy.pattern)} references unknown target`);
+    const candidate = legacy as { match: string; path: string; action: string; status: number; to?: string; locale?: string };
+    if (!candidate.path.startsWith("/")) errors.push(`Legacy path ${JSON.stringify(candidate.path)} must start with /`);
+    if (/[?#]/.test(candidate.path)) errors.push(`Legacy path ${JSON.stringify(candidate.path)} must be pathname-only`);
+    if (candidate.match !== "exact" && candidate.match !== "prefix") errors.push(`Legacy path ${JSON.stringify(candidate.path)} has invalid match semantics`);
+    if (candidate.action === "redirect") {
+      if (candidate.status !== 301) errors.push(`Legacy redirect ${JSON.stringify(candidate.path)} must have status 301`);
+      if (!candidate.to || !ROUTES[candidate.to as RouteId]) errors.push(`Legacy redirect ${JSON.stringify(candidate.path)} references unknown target`);
+      else if (!candidate.locale || !ROUTES[candidate.to as RouteId].activeLocales.includes(candidate.locale as Locale)) errors.push(`Legacy redirect ${JSON.stringify(candidate.path)} has inactive target locale`);
+    }
+    if (candidate.action === "gone" && candidate.status !== 410) errors.push(`Legacy gone route ${JSON.stringify(candidate.path)} must have status 410`);
+    if (candidate.action === "notFound" && candidate.status !== 404) errors.push(`Legacy notFound route ${JSON.stringify(candidate.path)} must have status 404`);
   }
   return errors;
 }
@@ -280,7 +358,7 @@ export function validateManifest(): string[] {
 export interface RouteRegistryJSON {
   readonly version: string;
   readonly locales: readonly string[];
-  readonly routes: Record<string, Omit<RouteDefinition, "id">>;
+  readonly routes: Readonly<Record<string, Omit<RouteDefinition, "id">>>;
   readonly legacy: readonly LegacyRoute[];
 }
 
@@ -334,5 +412,5 @@ function sha256Hex(input: string): string {
 export const registryVersion = `sha256:${sha256Hex(stableStringify(registryContent()))}`;
 
 export function toJSON(): RouteRegistryJSON {
-  return { version: registryVersion, ...registryContent() };
+  return deepFreeze({ version: registryVersion, ...registryContent() });
 }

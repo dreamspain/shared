@@ -21,5 +21,21 @@ Pin consumers to a reviewed Git commit rather than a branch:
 }
 ```
 
-It exports compiled JavaScript in `dist/`, TypeScript declarations, the route manifest,
-and strict URL helpers such as `pathFor`, `canonicalFor`, `alternatesFor`, and `matchRoute`.
+It exports compiled JavaScript in `dist/`, TypeScript declarations, the frozen route
+manifest, and strict URL helpers such as `pathFor`, `canonicalFor`, `alternatesFor`,
+`matchRoute`, and `resolveLegacyPath`.
+
+### Legacy Worker adapter
+
+`resolveLegacyPath(pathname)` is the sole pathname-only source for direct historical
+404/410 responses and 301 aliases. It performs neither slash normalization nor query
+parsing. For a redirect, an adapter must use its returned `targetPath` and preserve
+its request URL's query string itself; query retention is an adapter responsibility.
+The resolver returns `null` for a string containing `?` or `#` so callers pass only
+`URL.pathname`.
+
+### Reproducible package checks
+
+Run `npm ci`, then `npm run check:dist` to rebuild with the pinned local TypeScript
+compiler and fail if committed `dist/` is stale. `npm test` validates the contract and
+`npm pack --dry-run` verifies the publish surface.

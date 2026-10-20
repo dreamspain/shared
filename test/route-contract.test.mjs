@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import {
@@ -12,10 +15,13 @@ import {
   matchRoute,
   pathFor,
   registryVersion,
+  resolveLegacyPath,
   routerPattern,
   toJSON,
   validateManifest,
 } from "@dreamspain/tiehoy-route-contract";
+
+const repositoryRoot = fileURLToPath(new URL("..", import.meta.url));
 
 function stableStringify(value) {
   if (Array.isArray(value)) return `[${value.map(stableStringify).join(",")}]`;
@@ -38,12 +44,27 @@ test("exports the complete source manifest and explicit legacy dispositions", ()
   assert.deepEqual(
     LEGACY_ROUTES,
     [
-      { pattern: "/tie/*", action: "notFound", status: 404 },
-      { pattern: "/oficina/*", action: "notFound", status: 404 },
-      { pattern: "/oficinas/*", action: "notFound", status: 404 },
-      { pattern: "/office/*", action: "notFound", status: 404 },
+      { match: "prefix", path: "/tie/", action: "notFound", status: 404 },
+      { match: "prefix", path: "/oficina/", action: "notFound", status: 404 },
+      { match: "prefix", path: "/oficinas/", action: "notFound", status: 404 },
+      { match: "prefix", path: "/office/", action: "notFound", status: 404 },
+      { match: "exact", path: "/residence-renewal", action: "gone", status: 410 },
+      { match: "exact", path: "/es/renovacion-residencia", action: "gone", status: 410 },
+      { match: "exact", path: "/renewal", action: "gone", status: 410 },
+      { match: "exact", path: "/es/renovacion", action: "gone", status: 410 },
+      { match: "exact", path: "/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "zh" },
+      { match: "exact", path: "/en/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "en" },
+      { match: "exact", path: "/es/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "es" },
+      { match: "exact", path: "/fr/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "fr" },
+      { match: "exact", path: "/ru/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "ru" },
+      { match: "exact", path: "/zh/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "zh" },
+      { match: "exact", path: "/ar/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "ar" },
+      { match: "exact", path: "/zh/mentors/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "zh" },
     ],
   );
+  for (const id of ["privacy", "cookies", "terms", "legalNotice"]) {
+    assert.deepEqual(ROUTES[id].activeLocales, LOCALES, `${id} must remain public in all live locales`);
+  }
   assert.deepEqual(validateManifest(), []);
 });
 
@@ -66,8 +87,8 @@ test("constructs canonical localized paths without collapsing entity segments", 
 });
 
 test("rejects inactive locales, extra params, and unsafe dynamic raw slugs", () => {
-  throws(() => pathFor("privacy", "fr"), "inactive locale");
-  throws(() => routerPattern("privacy", "zh"), "inactive locale router pattern");
+  throws(() => pathFor("privacy", "ja"), "invalid locale");
+  throws(() => routerPattern("privacy", "ja"), "invalid locale router pattern");
   throws(() => pathFor("home", "en", { unexpected: "value" }), "static extra param");
   throws(() => pathFor("guideDetail", "en", { slug: "valid-slug", extra: "value" }), "entity extra param");
 
@@ -81,7 +102,7 @@ test("returns alternates whose x-default belongs to each request override", () =
   const alternates = alternatesFor("guideDetail", { slug: "tie-spain-guide" }, override);
   assert.deepEqual(Object.keys(alternates), ["fr", "es", "x-default"]);
   assert.equal(alternates["x-default"], alternates.fr);
-  throws(() => alternatesFor("privacy", undefined, ["fr"]), "inactive override locale");
+  throws(() => alternatesFor("privacy", undefined, ["ja"]), "invalid override locale");
   throws(() => alternatesFor("home", undefined, []), "empty override");
 });
 
@@ -96,10 +117,58 @@ test("matches only active, raw-slug route paths", () => {
     locale: "es",
     params: {},
   });
-  assert.equal(matchRoute("/fr/privacy/"), null);
+  assert.deepEqual(matchRoute("/fr/privacy/"), {
+    route: ROUTES.privacy,
+    locale: "fr",
+    params: {},
+  });
   for (const path of ["/guides/UPPER/", "/guides/%2f/", "/guides/a%2Fb/", "/guides/../", "/guides/has?query/"]) {
     assert.equal(matchRoute(path), null, `must reject ${path}`);
   }
+});
+
+test("resolves legacy paths with exact and prefix semantics without normalization", () => {
+  assert.deepEqual(resolveLegacyPath("/tie/historical"), { action: "notFound", status: 404 });
+  assert.deepEqual(resolveLegacyPath("/office/"), { action: "notFound", status: 404 });
+  assert.equal(resolveLegacyPath("/tie"), null, "prefix must include its documented trailing slash");
+  assert.equal(resolveLegacyPath("/office?legacy=1"), null, "pathname resolver must not parse query strings");
+
+  for (const pathname of ["/residence-renewal", "/es/renovacion-residencia", "/renewal", "/es/renovacion"]) {
+    assert.deepEqual(resolveLegacyPath(pathname), { action: "gone", status: 410 }, pathname);
+    assert.equal(resolveLegacyPath(`${pathname}/`), null, `${pathname}/ must not be normalized`);
+  }
+
+  assert.deepEqual(resolveLegacyPath("/tiger/"), { action: "redirect", status: 301, targetPath: "/mentors/tiger/" });
+  assert.deepEqual(resolveLegacyPath("/es/tiger/"), { action: "redirect", status: 301, targetPath: "/es/mentors/tiger/" });
+  assert.deepEqual(resolveLegacyPath("/zh/mentors/tiger/"), { action: "redirect", status: 301, targetPath: "/mentors/tiger/" });
+  assert.equal(resolveLegacyPath("/es/tiger"), null, "exact alias must retain its slash requirement");
+  assert.equal(resolveLegacyPath("/tiger/?utm=legacy"), null, "query preservation belongs to the Worker adapter");
+});
+
+test("freezes exported registry state so mutations cannot change route identity", () => {
+  const originalPath = pathFor("privacy", "fr");
+  const originalVersion = registryVersion;
+  const originalJSON = toJSON();
+
+  assert.equal(Object.isFrozen(LOCALES), true);
+  assert.equal(Object.isFrozen(ROUTE_IDS), true);
+  assert.equal(Object.isFrozen(ROUTES), true);
+  assert.equal(Object.isFrozen(ROUTES.privacy), true);
+  assert.equal(Object.isFrozen(ROUTES.privacy.activeLocales), true);
+  assert.equal(Object.isFrozen(LEGACY_ROUTES), true);
+  assert.equal(Object.isFrozen(LEGACY_ROUTES[0]), true);
+
+  assert.throws(() => { ROUTES.privacy.activeLocales.push("en"); }, TypeError);
+  assert.throws(() => { ROUTES.privacy.slug = "compromised"; }, TypeError);
+  assert.throws(() => { LEGACY_ROUTES[0].path = "/compromised/"; }, TypeError);
+  assert.throws(() => { LOCALES.push("en"); }, TypeError);
+
+  const exportedJSON = toJSON();
+  assert.equal(Object.isFrozen(exportedJSON), true);
+  assert.throws(() => { exportedJSON.routes.privacy.slug = "compromised"; }, TypeError);
+  assert.equal(pathFor("privacy", "fr"), originalPath);
+  assert.equal(registryVersion, originalVersion);
+  assert.deepEqual(toJSON(), originalJSON);
 });
 
 test("publishes a deterministic content-addressed registry version", () => {
@@ -110,4 +179,20 @@ test("publishes a deterministic content-addressed registry version", () => {
   const expected = `sha256:${createHash("sha256").update(stableStringify(content)).digest("hex")}`;
   assert.equal(registryVersion, expected);
   assert.notEqual(registryVersion, new Date().toISOString().slice(0, 10));
+});
+
+test("pins the compiler and packs exactly the public package surface", () => {
+  const packageJSON = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+  assert.match(packageJSON.devDependencies?.typescript ?? "", /^\d+\.\d+\.\d+$/);
+  assert.equal(typeof packageJSON.scripts?.["check:dist"], "string");
+
+  const pack = JSON.parse(execFileSync("npm", ["pack", "--json", "--dry-run"], {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+  }));
+  assert.equal(pack.length, 1);
+  assert.deepEqual(
+    pack[0].files.map((entry) => entry.path).sort(),
+    ["README.md", "dist/index.d.ts", "dist/index.js", "package.json"],
+  );
 });

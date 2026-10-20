@@ -21,19 +21,59 @@ export interface RouteDefinition {
     readonly scltSlug?: string;
     readonly deepLink: boolean;
 }
-export interface LegacyRoute {
-    readonly pattern: string;
-    readonly action: "redirect" | "gone" | "notFound";
-    readonly to?: RouteId;
-    readonly status: 301 | 404 | 410;
+export interface LegacyNotFoundRoute {
+    readonly match: "exact" | "prefix";
+    readonly path: string;
+    readonly action: "notFound";
+    readonly status: 404;
 }
+export interface LegacyGoneRoute {
+    readonly match: "exact" | "prefix";
+    readonly path: string;
+    readonly action: "gone";
+    readonly status: 410;
+}
+export interface LegacyRedirectRoute {
+    readonly match: "exact" | "prefix";
+    readonly path: string;
+    readonly action: "redirect";
+    readonly status: 301;
+    /** Route identity used to compute the canonical redirect target. */
+    readonly to: RouteId;
+    /** Locale used to compute the canonical redirect target. */
+    readonly locale: Locale;
+}
+/** A historical path policy with explicit matching and HTTP semantics. */
+export type LegacyRoute = LegacyNotFoundRoute | LegacyGoneRoute | LegacyRedirectRoute;
+export type LegacyPathResolution = Readonly<{
+    action: "notFound";
+    status: 404;
+}> | Readonly<{
+    action: "gone";
+    status: 410;
+}> | Readonly<{
+    action: "redirect";
+    status: 301;
+    targetPath: string;
+}>;
 export declare const TIEHOY_ORIGIN = "https://tiehoy.com";
 export declare const SCLT_ORIGIN = "https://sclt.es";
 export declare const ROUTES: Readonly<Record<RouteId, RouteDefinition>>;
-/** Retired aliases deliberately remain direct 404s; they must not be revived implicitly. */
+/**
+ * Current historical path behavior from the Worker. `match` is deliberately
+ * explicit: exact entries do not accept a slash variant, and prefix entries
+ * include their required trailing slash. These are pathname-only policies.
+ */
 export declare const LEGACY_ROUTES: readonly LegacyRoute[];
 /** Build an active, locale-aware route path. Dynamic params must be raw canonical slugs. */
 export declare function pathFor(id: RouteId | string, locale: Locale | string, params?: Readonly<Record<string, string>>): string;
+/**
+ * Resolve only a raw URL pathname against documented legacy behavior.
+ * This function does not add or remove a slash and rejects query/fragment
+ * input. A Worker adapter must preserve an incoming query when it constructs
+ * a redirect URL from `targetPath`.
+ */
+export declare function resolveLegacyPath(pathname: string): LegacyPathResolution | null;
 export declare function canonicalFor(id: RouteId | string, locale: Locale | string, params?: Readonly<Record<string, string>>): string;
 /**
  * Locale alternate canonical URLs. An override is an active per-request subset;
@@ -60,7 +100,7 @@ export declare function validateManifest(): string[];
 export interface RouteRegistryJSON {
     readonly version: string;
     readonly locales: readonly string[];
-    readonly routes: Record<string, Omit<RouteDefinition, "id">>;
+    readonly routes: Readonly<Record<string, Omit<RouteDefinition, "id">>>;
     readonly legacy: readonly LegacyRoute[];
 }
 /** Stable SHA-256 of the JSON-exported route content, never date-derived. */
