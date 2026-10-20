@@ -48,10 +48,10 @@ test("exports the complete source manifest and explicit legacy dispositions", ()
       { match: "prefix", path: "/oficina/", action: "notFound", status: 404 },
       { match: "prefix", path: "/oficinas/", action: "notFound", status: 404 },
       { match: "prefix", path: "/office/", action: "notFound", status: 404 },
-      { match: "exact", path: "/residence-renewal", action: "gone", status: 410 },
-      { match: "exact", path: "/es/renovacion-residencia", action: "gone", status: 410 },
-      { match: "exact", path: "/renewal", action: "gone", status: 410 },
-      { match: "exact", path: "/es/renovacion", action: "gone", status: 410 },
+      { match: "exactOrTrailingSlash", path: "/residence-renewal", action: "gone", status: 410 },
+      { match: "exactOrTrailingSlash", path: "/es/renovacion-residencia", action: "gone", status: 410 },
+      { match: "exactOrTrailingSlash", path: "/renewal", action: "gone", status: 410 },
+      { match: "exactOrTrailingSlash", path: "/es/renovacion", action: "gone", status: 410 },
       { match: "exact", path: "/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "zh" },
       { match: "exact", path: "/en/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "en" },
       { match: "exact", path: "/es/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "es" },
@@ -127,15 +127,21 @@ test("matches only active, raw-slug route paths", () => {
   }
 });
 
-test("resolves legacy paths with exact and prefix semantics without normalization", () => {
+test("resolves legacy paths with explicit semantics without general normalization", () => {
   assert.deepEqual(resolveLegacyPath("/tie/historical"), { action: "notFound", status: 404 });
   assert.deepEqual(resolveLegacyPath("/office/"), { action: "notFound", status: 404 });
   assert.equal(resolveLegacyPath("/tie"), null, "prefix must include its documented trailing slash");
   assert.equal(resolveLegacyPath("/office?legacy=1"), null, "pathname resolver must not parse query strings");
 
   for (const pathname of ["/residence-renewal", "/es/renovacion-residencia", "/renewal", "/es/renovacion"]) {
-    assert.deepEqual(resolveLegacyPath(pathname), { action: "gone", status: 410 }, pathname);
-    assert.equal(resolveLegacyPath(`${pathname}/`), null, `${pathname}/ must not be normalized`);
+    for (const variant of [pathname, `${pathname}/`]) {
+      const requestPathname = new URL(`https://tiehoy.com${variant}?legacy=1`).pathname;
+      assert.equal(requestPathname, variant, "Worker adapters must pass URL.pathname");
+      assert.deepEqual(resolveLegacyPath(requestPathname), { action: "gone", status: 410 }, requestPathname);
+    }
+    for (const nonmatch of [`${pathname}//`, `${pathname}/archive`, `${pathname}-archive`]) {
+      assert.equal(resolveLegacyPath(nonmatch), null, `${nonmatch} must not match the retirement`);
+    }
   }
 
   assert.deepEqual(resolveLegacyPath("/tiger/"), { action: "redirect", status: 301, targetPath: "/mentors/tiger/" });

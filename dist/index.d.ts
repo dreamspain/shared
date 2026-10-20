@@ -21,20 +21,22 @@ export interface RouteDefinition {
     readonly scltSlug?: string;
     readonly deepLink: boolean;
 }
+/** Explicit pathname semantics for a historical route policy. */
+export type LegacyMatch = "exact" | "exactOrTrailingSlash" | "prefix";
 export interface LegacyNotFoundRoute {
-    readonly match: "exact" | "prefix";
+    readonly match: LegacyMatch;
     readonly path: string;
     readonly action: "notFound";
     readonly status: 404;
 }
 export interface LegacyGoneRoute {
-    readonly match: "exact" | "prefix";
+    readonly match: LegacyMatch;
     readonly path: string;
     readonly action: "gone";
     readonly status: 410;
 }
 export interface LegacyRedirectRoute {
-    readonly match: "exact" | "prefix";
+    readonly match: LegacyMatch;
     readonly path: string;
     readonly action: "redirect";
     readonly status: 301;
@@ -61,8 +63,9 @@ export declare const SCLT_ORIGIN = "https://sclt.es";
 export declare const ROUTES: Readonly<Record<RouteId, RouteDefinition>>;
 /**
  * Current historical path behavior from the Worker. `match` is deliberately
- * explicit: exact entries do not accept a slash variant, and prefix entries
- * include their required trailing slash. These are pathname-only policies.
+ * explicit: exact entries do not accept a slash variant, retirement entries
+ * accept exactly one optional trailing slash, and prefix entries include their
+ * required trailing slash. These are pathname-only policies.
  */
 export declare const LEGACY_ROUTES: readonly LegacyRoute[];
 /** Build an active, locale-aware route path. Dynamic params must be raw canonical slugs. */

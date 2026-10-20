@@ -28,9 +28,12 @@ manifest, and strict URL helpers such as `pathFor`, `canonicalFor`, `alternatesF
 ### Legacy Worker adapter
 
 `resolveLegacyPath(pathname)` is the sole pathname-only source for direct historical
-404/410 responses and 301 aliases. It performs neither slash normalization nor query
-parsing. For a redirect, an adapter must use its returned `targetPath` and preserve
-its request URL's query string itself; query retention is an adapter responsibility.
+404/410 responses and 301 aliases. Its explicit match policies preserve whether a
+historical route is exact, prefix-based, or accepts exactly one trailing slash; the
+four residence retirements accept both their unslashed and one-trailing-slash forms.
+It performs no general slash normalization or query parsing. For a redirect, an
+adapter must use its returned `targetPath` and preserve its request URL's query string
+itself; query retention is an adapter responsibility.
 The resolver returns `null` for a string containing `?` or `#` so callers pass only
 `URL.pathname`.
 

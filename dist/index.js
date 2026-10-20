@@ -55,18 +55,19 @@ export const ROUTES = deepFreeze({
 });
 /**
  * Current historical path behavior from the Worker. `match` is deliberately
- * explicit: exact entries do not accept a slash variant, and prefix entries
- * include their required trailing slash. These are pathname-only policies.
+ * explicit: exact entries do not accept a slash variant, retirement entries
+ * accept exactly one optional trailing slash, and prefix entries include their
+ * required trailing slash. These are pathname-only policies.
  */
 export const LEGACY_ROUTES = deepFreeze([
     { match: "prefix", path: "/tie/", action: "notFound", status: 404 },
     { match: "prefix", path: "/oficina/", action: "notFound", status: 404 },
     { match: "prefix", path: "/oficinas/", action: "notFound", status: 404 },
     { match: "prefix", path: "/office/", action: "notFound", status: 404 },
-    { match: "exact", path: "/residence-renewal", action: "gone", status: 410 },
-    { match: "exact", path: "/es/renovacion-residencia", action: "gone", status: 410 },
-    { match: "exact", path: "/renewal", action: "gone", status: 410 },
-    { match: "exact", path: "/es/renovacion", action: "gone", status: 410 },
+    { match: "exactOrTrailingSlash", path: "/residence-renewal", action: "gone", status: 410 },
+    { match: "exactOrTrailingSlash", path: "/es/renovacion-residencia", action: "gone", status: 410 },
+    { match: "exactOrTrailingSlash", path: "/renewal", action: "gone", status: 410 },
+    { match: "exactOrTrailingSlash", path: "/es/renovacion", action: "gone", status: 410 },
     { match: "exact", path: "/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "zh" },
     { match: "exact", path: "/en/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "en" },
     { match: "exact", path: "/es/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "es" },
@@ -136,7 +137,11 @@ export function resolveLegacyPath(pathname) {
     if (typeof pathname !== "string" || !pathname.startsWith("/") || /[?#]/.test(pathname))
         return null;
     for (const legacy of LEGACY_ROUTES) {
-        const matches = legacy.match === "exact" ? pathname === legacy.path : pathname.startsWith(legacy.path);
+        const matches = legacy.match === "exact"
+            ? pathname === legacy.path
+            : legacy.match === "exactOrTrailingSlash"
+                ? pathname === legacy.path || pathname === `${legacy.path}/`
+                : pathname.startsWith(legacy.path);
         if (!matches)
             continue;
         if (legacy.action === "redirect") {
@@ -300,8 +305,10 @@ export function validateManifest() {
             errors.push(`Legacy path ${JSON.stringify(candidate.path)} must start with /`);
         if (/[?#]/.test(candidate.path))
             errors.push(`Legacy path ${JSON.stringify(candidate.path)} must be pathname-only`);
-        if (candidate.match !== "exact" && candidate.match !== "prefix")
+        if (candidate.match !== "exact" && candidate.match !== "exactOrTrailingSlash" && candidate.match !== "prefix")
             errors.push(`Legacy path ${JSON.stringify(candidate.path)} has invalid match semantics`);
+        if (candidate.match === "exactOrTrailingSlash" && candidate.path.endsWith("/"))
+            errors.push(`Legacy path ${JSON.stringify(candidate.path)} must omit the optional trailing slash`);
         if (candidate.action === "redirect") {
             if (candidate.status !== 301)
                 errors.push(`Legacy redirect ${JSON.stringify(candidate.path)} must have status 301`);
