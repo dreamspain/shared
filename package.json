@@ -1,0 +1,28 @@
+{
+  "name": "@dreamspain/tiehoy-route-contract",
+  "version": "0.1.0",
+  "description": "Dependency-free public route identity contract for TIEHoy.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "pack:check": "npm pack --dry-run"
+  },
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  }
+}
