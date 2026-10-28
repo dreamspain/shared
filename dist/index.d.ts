@@ -44,6 +44,8 @@ export interface LegacyRedirectRoute {
     readonly to: RouteId;
     /** Locale used to compute the canonical redirect target. */
     readonly locale: Locale;
+    /** Target route params; values must be raw canonical slugs. */
+    readonly params?: Readonly<Record<string, string>>;
 }
 /** A historical path policy with explicit matching and HTTP semantics. */
 export type LegacyRoute = LegacyNotFoundRoute | LegacyGoneRoute | LegacyRedirectRoute;

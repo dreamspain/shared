@@ -60,6 +60,18 @@ test("exports the complete source manifest and explicit legacy dispositions", ()
       { match: "exact", path: "/zh/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "zh" },
       { match: "exact", path: "/ar/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "ar" },
       { match: "exact", path: "/zh/mentors/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "zh" },
+      { match: "exact", path: "/guides/tasa_790_012/", action: "redirect", status: 301, to: "guideDetail", locale: "en", params: { slug: "tasa-790-012" } },
+      { match: "exact", path: "/es/guides/tasa_790_012/", action: "redirect", status: 301, to: "guideDetail", locale: "es", params: { slug: "tasa-790-012" } },
+      { match: "exact", path: "/fr/guides/tasa_790_012/", action: "redirect", status: 301, to: "guideDetail", locale: "fr", params: { slug: "tasa-790-012" } },
+      { match: "exact", path: "/ru/guides/tasa_790_012/", action: "redirect", status: 301, to: "guideDetail", locale: "ru", params: { slug: "tasa-790-012" } },
+      { match: "exact", path: "/zh/guides/tasa_790_012/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "tasa-790-012" } },
+      { match: "exact", path: "/ar/guides/tasa_790_012/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "tasa-790-012" } },
+      { match: "exact", path: "/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "en", params: { slug: "tasa-790-012-invitation" } },
+      { match: "exact", path: "/es/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "es", params: { slug: "tasa-790-012-invitation" } },
+      { match: "exact", path: "/fr/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "fr", params: { slug: "tasa-790-012-invitation" } },
+      { match: "exact", path: "/ru/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ru", params: { slug: "tasa-790-012-invitation" } },
+      { match: "exact", path: "/zh/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "tasa-790-012-invitation" } },
+      { match: "exact", path: "/ar/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "tasa-790-012-invitation" } },
     ],
   );
   for (const id of ["privacy", "cookies", "terms", "legalNotice"]) {
@@ -149,6 +161,40 @@ test("resolves legacy paths with explicit semantics without general normalizatio
   assert.deepEqual(resolveLegacyPath("/zh/mentors/tiger/"), { action: "redirect", status: 301, targetPath: "/mentors/tiger/" });
   assert.equal(resolveLegacyPath("/es/tiger"), null, "exact alias must retain its slash requirement");
   assert.equal(resolveLegacyPath("/tiger/?utm=legacy"), null, "query preservation belongs to the Worker adapter");
+
+  assert.deepEqual(resolveLegacyPath("/es/guides/tasa_790_012/"), {
+    action: "redirect",
+    status: 301,
+    targetPath: "/es/guides/tasa-790-012/",
+  });
+  assert.deepEqual(resolveLegacyPath("/guides/tasa_790_012_invitation/"), {
+    action: "redirect",
+    status: 301,
+    targetPath: "/guides/tasa-790-012-invitation/",
+  });
+  assert.equal(resolveLegacyPath("/es/guides/tasa_790_012"), null, "exact legacy paths require trailing slash");
+
+  const underscoreGuideLegacyPaths = [
+    ["/guides/tasa_790_012/", "/guides/tasa-790-012/"],
+    ["/es/guides/tasa_790_012/", "/es/guides/tasa-790-012/"],
+    ["/fr/guides/tasa_790_012/", "/fr/guides/tasa-790-012/"],
+    ["/ru/guides/tasa_790_012/", "/ru/guides/tasa-790-012/"],
+    ["/zh/guides/tasa_790_012/", "/zh/guides/tasa-790-012/"],
+    ["/ar/guides/tasa_790_012/", "/ar/guides/tasa-790-012/"],
+    ["/guides/tasa_790_012_invitation/", "/guides/tasa-790-012-invitation/"],
+    ["/es/guides/tasa_790_012_invitation/", "/es/guides/tasa-790-012-invitation/"],
+    ["/fr/guides/tasa_790_012_invitation/", "/fr/guides/tasa-790-012-invitation/"],
+    ["/ru/guides/tasa_790_012_invitation/", "/ru/guides/tasa-790-012-invitation/"],
+    ["/zh/guides/tasa_790_012_invitation/", "/zh/guides/tasa-790-012-invitation/"],
+    ["/ar/guides/tasa_790_012_invitation/", "/ar/guides/tasa-790-012-invitation/"],
+  ];
+  for (const [legacyPath, targetPath] of underscoreGuideLegacyPaths) {
+    assert.deepEqual(
+      resolveLegacyPath(legacyPath),
+      { action: "redirect", status: 301, targetPath },
+      legacyPath,
+    );
+  }
 });
 
 test("freezes exported registry state so mutations cannot change route identity", () => {

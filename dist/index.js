@@ -76,6 +76,20 @@ export const LEGACY_ROUTES = deepFreeze([
     { match: "exact", path: "/zh/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "zh" },
     { match: "exact", path: "/ar/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "ar" },
     { match: "exact", path: "/zh/mentors/tiger/", action: "redirect", status: 301, to: "mentorTiger", locale: "zh" },
+    // 2026-10-28 underscore slug rename; GSC 28d impressions>0 (元要求 §三.3 301 rule).
+    { match: "exact", path: "/guides/tasa_790_012/", action: "redirect", status: 301, to: "guideDetail", locale: "en", params: { slug: "tasa-790-012" } },
+    { match: "exact", path: "/es/guides/tasa_790_012/", action: "redirect", status: 301, to: "guideDetail", locale: "es", params: { slug: "tasa-790-012" } },
+    { match: "exact", path: "/fr/guides/tasa_790_012/", action: "redirect", status: 301, to: "guideDetail", locale: "fr", params: { slug: "tasa-790-012" } },
+    { match: "exact", path: "/ru/guides/tasa_790_012/", action: "redirect", status: 301, to: "guideDetail", locale: "ru", params: { slug: "tasa-790-012" } },
+    { match: "exact", path: "/zh/guides/tasa_790_012/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "tasa-790-012" } },
+    { match: "exact", path: "/ar/guides/tasa_790_012/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "tasa-790-012" } },
+    // 2026-10-28 underscore slug rename; GSC 28d impressions>0 (元要求 §三.3 301 rule).
+    { match: "exact", path: "/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "en", params: { slug: "tasa-790-012-invitation" } },
+    { match: "exact", path: "/es/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "es", params: { slug: "tasa-790-012-invitation" } },
+    { match: "exact", path: "/fr/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "fr", params: { slug: "tasa-790-012-invitation" } },
+    { match: "exact", path: "/ru/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ru", params: { slug: "tasa-790-012-invitation" } },
+    { match: "exact", path: "/zh/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "tasa-790-012-invitation" } },
+    { match: "exact", path: "/ar/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "tasa-790-012-invitation" } },
 ]);
 const RAW_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 function fail(message) {
@@ -145,7 +159,7 @@ export function resolveLegacyPath(pathname) {
         if (!matches)
             continue;
         if (legacy.action === "redirect") {
-            return deepFreeze({ action: "redirect", status: 301, targetPath: pathFor(legacy.to, legacy.locale) });
+            return deepFreeze({ action: "redirect", status: 301, targetPath: pathFor(legacy.to, legacy.locale, legacy.params) });
         }
         if (legacy.action === "gone")
             return deepFreeze({ action: "gone", status: 410 });
@@ -316,6 +330,26 @@ export function validateManifest() {
                 errors.push(`Legacy redirect ${JSON.stringify(candidate.path)} references unknown target`);
             else if (!candidate.locale || !ROUTES[candidate.to].activeLocales.includes(candidate.locale))
                 errors.push(`Legacy redirect ${JSON.stringify(candidate.path)} has inactive target locale`);
+            else {
+                const targetRoute = ROUTES[candidate.to];
+                const expectedParams = targetRoute.params ?? [];
+                if (expectedParams.length) {
+                    const redirect = legacy;
+                    const suppliedKeys = Object.keys(redirect.params ?? {}).sort();
+                    const expectedKeys = [...expectedParams].sort();
+                    if (suppliedKeys.length !== expectedKeys.length || !expectedKeys.every((key, index) => suppliedKeys[index] === key)) {
+                        errors.push(`Legacy redirect ${JSON.stringify(candidate.path)} has invalid target params`);
+                    }
+                    else {
+                        try {
+                            pathFor(candidate.to, candidate.locale, redirect.params);
+                        }
+                        catch {
+                            errors.push(`Legacy redirect ${JSON.stringify(candidate.path)} has invalid target params`);
+                        }
+                    }
+                }
+            }
         }
         if (candidate.action === "gone" && candidate.status !== 410)
             errors.push(`Legacy gone route ${JSON.stringify(candidate.path)} must have status 410`);
