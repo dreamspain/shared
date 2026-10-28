@@ -38,8 +38,8 @@ function throws(fn, message) {
 // The mandated source registry currently declares 30 IDs (not 32); this is a
 // fidelity guard so unknown routes are never invented by the producer package.
 test("exports the complete source manifest and explicit legacy dispositions", () => {
-  assert.equal(ROUTE_IDS.length, 30);
-  assert.equal(Object.keys(ROUTES).length, 30);
+  assert.equal(ROUTE_IDS.length, 31);
+  assert.equal(Object.keys(ROUTES).length, 31);
   assert.deepEqual(LOCALES, ["en", "es", "fr", "ru", "zh", "ar"]);
   assert.deepEqual(
     LEGACY_ROUTES,
@@ -143,6 +143,16 @@ test("returns alternates whose x-default belongs to each request override", () =
   assert.equal(alternates["x-default"], alternates.fr);
   throws(() => alternatesFor("privacy", undefined, ["ja"]), "invalid override locale");
   throws(() => alternatesFor("home", undefined, []), "empty override");
+});
+
+test("cita signals page: static slug wins over the province entity in every locale", () => {
+  assert.equal(pathFor("citaSignals", "es"), "/es/cita/disponibles/");
+  assert.equal(pathFor("citaSignals", "en"), "/cita/available/");
+  assert.equal(pathFor("citaSignals", "ar"), "/ar/cita/available/");
+  for (const locale of LOCALES) {
+    assert.equal(matchRoute(pathFor("citaSignals", locale)).route, ROUTES.citaSignals, locale);
+  }
+  assert.equal(matchRoute("/es/cita/madrid/").route, ROUTES.citaPreviaProvince);
 });
 
 test("matches only active, raw-slug route paths", () => {

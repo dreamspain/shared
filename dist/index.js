@@ -12,7 +12,7 @@ function deepFreeze(value) {
 export const LOCALES = deepFreeze(["en", "es", "fr", "ru", "zh", "ar"]);
 export const ROUTE_IDS = deepFreeze([
     "home", "lote", "loteCheck", "loteNotify", "loteNotifyConfirmed",
-    "citaPrevia", "citaPreviaAll", "citaPreviaBook", "citaPreviaProvince", "citaPreviaOffice",
+    "citaPrevia", "citaPreviaAll", "citaSignals", "citaPreviaBook", "citaPreviaProvince", "citaPreviaOffice",
     "pausedOffices", "topicsIndex", "hubTieCardRenewal", "hubResidenceRenewal",
     "hubFamilyReunification", "hubInvitationLetter", "guidesIndex", "guideDetail",
     "invitesIndex", "inviteDetail", "mentorsIndex", "lifeIndex", "lifeHave", "lifeNeed",
@@ -29,6 +29,8 @@ export const ROUTES = deepFreeze({
     loteNotifyConfirmed: { id: "loteNotifyConfirmed", kind: "static", slug: "lote/notify/confirmed", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
     citaPrevia: { id: "citaPrevia", kind: "static", slug: "cita", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     citaPreviaAll: { id: "citaPreviaAll", kind: "static", slug: "cita/all", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
+    // Static before cita/:province (same pattern as cita/all); neither slug is a province slug.
+    citaSignals: { id: "citaSignals", kind: "static", slug: "cita/available", esSlug: "cita/disponibles", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     citaPreviaBook: { id: "citaPreviaBook", kind: "static", slug: "cita/book", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
     citaPreviaProvince: { id: "citaPreviaProvince", kind: "entity", slug: "cita/:province", params: ["province"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", scltSlug: "tie/:province", deepLink: false },
     citaPreviaOffice: { id: "citaPreviaOffice", kind: "entity", slug: "cita/:province/:office", params: ["province", "office"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", scltSlug: "tie/:province/:office", deepLink: false },
