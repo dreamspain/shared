@@ -12,7 +12,7 @@ function deepFreeze(value) {
 export const LOCALES = deepFreeze(["en", "es", "fr", "ru", "zh", "ar"]);
 export const ROUTE_IDS = deepFreeze([
     "home", "lote", "loteCheck", "loteNotify", "loteNotifyConfirmed",
-    "citaPrevia", "citaPreviaAll", "citaPreviaBook", "citaPreviaProvince", "citaPreviaOffice",
+    "citaPrevia", "citaPreviaAll", "citaPreviaBook", "citaAlerts", "citaPreviaProvince", "citaPreviaOffice",
     "pausedOffices", "topicsIndex", "hubTieCardRenewal", "hubResidenceRenewal",
     "hubFamilyReunification", "hubInvitationLetter", "guidesIndex", "guideDetail",
     "invitesIndex", "inviteDetail", "mentorsIndex", "lifeIndex", "lifeHave", "lifeNeed",
@@ -30,6 +30,7 @@ export const ROUTES = deepFreeze({
     citaPrevia: { id: "citaPrevia", kind: "static", slug: "cita", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     citaPreviaAll: { id: "citaPreviaAll", kind: "static", slug: "cita/all", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     citaPreviaBook: { id: "citaPreviaBook", kind: "static", slug: "cita/book", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
+    citaAlerts: { id: "citaAlerts", kind: "static", slug: "cita/avisos", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
     citaPreviaProvince: { id: "citaPreviaProvince", kind: "entity", slug: "cita/:province", params: ["province"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", scltSlug: "tie/:province", deepLink: false },
     citaPreviaOffice: { id: "citaPreviaOffice", kind: "entity", slug: "cita/:province/:office", params: ["province", "office"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", scltSlug: "tie/:province/:office", deepLink: false },
     pausedOffices: { id: "pausedOffices", kind: "static", slug: "offices/paused", esSlug: "oficinas/pausadas", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },

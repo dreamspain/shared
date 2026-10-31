@@ -35,11 +35,11 @@ function throws(fn, message) {
   assert.throws(fn, /route-contract/, message);
 }
 
-// The mandated source registry currently declares 30 IDs (not 32); this is a
+// The mandated source registry currently declares 31 IDs; this is a
 // fidelity guard so unknown routes are never invented by the producer package.
 test("exports the complete source manifest and explicit legacy dispositions", () => {
-  assert.equal(ROUTE_IDS.length, 30);
-  assert.equal(Object.keys(ROUTES).length, 30);
+  assert.equal(ROUTE_IDS.length, 31);
+  assert.equal(Object.keys(ROUTES).length, 31);
   assert.deepEqual(LOCALES, ["en", "es", "fr", "ru", "zh", "ar"]);
   assert.deepEqual(
     LEGACY_ROUTES,
@@ -285,4 +285,11 @@ test("cita-previa → cita: GSC URLs 301 to the renamed route, the rest of the o
   assert.deepEqual(resolveLegacyPath("/es/cita-previa/"), { action: "notFound", status: 404 });
   assert.deepEqual(resolveLegacyPath("/zh/cita-previa/madrid/getafe/"), { action: "notFound", status: 404 });
   assert.equal(matchRoute("/cita-previa/murcia/"), null, "old prefix is no longer a route");
+});
+
+test("citaAlerts is a noindex static page under /cita/avisos/", () => {
+  assert.equal(pathFor("citaAlerts", "en"), "/cita/avisos/");
+  assert.equal(pathFor("citaAlerts", "es"), "/es/cita/avisos/");
+  assert.equal(ROUTES.citaAlerts.indexability, "noindex");
+  assert.equal(ROUTES.citaAlerts.sitemap, "never");
 });
