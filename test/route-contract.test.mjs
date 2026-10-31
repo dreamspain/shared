@@ -35,11 +35,11 @@ function throws(fn, message) {
   assert.throws(fn, /route-contract/, message);
 }
 
-// The mandated source registry currently declares 31 IDs; this is a
+// The mandated source registry currently declares 33 IDs; this is a
 // fidelity guard so unknown routes are never invented by the producer package.
 test("exports the complete source manifest and explicit legacy dispositions", () => {
-  assert.equal(ROUTE_IDS.length, 31);
-  assert.equal(Object.keys(ROUTES).length, 31);
+  assert.equal(ROUTE_IDS.length, 33);
+  assert.equal(Object.keys(ROUTES).length, 33);
   assert.deepEqual(LOCALES, ["en", "es", "fr", "ru", "zh", "ar"]);
   assert.deepEqual(
     LEGACY_ROUTES,
@@ -292,4 +292,15 @@ test("citaAlerts is a noindex static page under /cita/avisos/", () => {
   assert.equal(pathFor("citaAlerts", "es"), "/es/cita/avisos/");
   assert.equal(ROUTES.citaAlerts.indexability, "noindex");
   assert.equal(ROUTES.citaAlerts.sitemap, "never");
+});
+
+test("weekly lote report routes: province report and weekly archive", () => {
+  assert.equal(pathFor("citaProvinceReport", "es", { province: "madrid" }), "/es/cita/madrid/informe/");
+  assert.equal(pathFor("citaProvinceReport", "en", { province: "madrid" }), "/cita/madrid/informe/");
+  assert.equal(pathFor("citaWeeklyArchive", "es", { week: "2026-w44" }), "/es/cita/informe/2026-w44/");
+  assert.equal(pathFor("citaWeeklyArchive", "zh", { week: "2026-w44" }), "/zh/cita/informe/2026-w44/");
+  assert.equal(matchRoute("/es/cita/madrid/informe/")?.route.id ?? matchRoute("/es/cita/madrid/informe/")?.id, "citaProvinceReport");
+  assert.equal(matchRoute("/cita/informe/2026-w44/")?.route.id ?? matchRoute("/cita/informe/2026-w44/")?.id, "citaWeeklyArchive");
+  assert.equal(ROUTES.citaProvinceReport.indexability, "indexable");
+  assert.equal(ROUTES.citaWeeklyArchive.indexability, "indexable");
 });
