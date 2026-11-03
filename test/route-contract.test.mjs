@@ -38,8 +38,8 @@ function throws(fn, message) {
 // The mandated source registry currently declares 33 IDs; this is a
 // fidelity guard so unknown routes are never invented by the producer package.
 test("exports the complete source manifest and explicit legacy dispositions", () => {
-  assert.equal(ROUTE_IDS.length, 36);
-  assert.equal(Object.keys(ROUTES).length, 36);
+  assert.equal(ROUTE_IDS.length, 37);
+  assert.equal(Object.keys(ROUTES).length, 37);
   assert.deepEqual(LOCALES, ["en", "es", "fr", "ru", "zh", "ar"]);
   assert.deepEqual(
     LEGACY_ROUTES,

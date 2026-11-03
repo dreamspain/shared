@@ -1,7 +1,7 @@
 /** Dependency-free public route identity contract for TIEHoy. */
 export declare const LOCALES: readonly ["en", "es", "fr", "ru", "zh", "ar"];
 export type Locale = (typeof LOCALES)[number];
-export declare const ROUTE_IDS: readonly ["home", "lote", "loteCheck", "loteNotify", "loteNotifyConfirmed", "loteProvince", "citaPrevia", "citaPreviaAll", "citaPreviaBook", "citaAlerts", "citaPreviaProvince", "citaProvinceReport", "citaWeeklyArchive", "citaPreviaOffice", "pausedOffices", "topicsIndex", "hubTieCardRenewal", "hubResidenceRenewal", "hubFamilyReunification", "hubInvitationLetter", "guidesIndex", "guideDetail", "invitesIndex", "inviteDetail", "mentorsIndex", "lifeIndex", "lifeHave", "lifeNeed", "lifeHaveDetail", "lifeNeedDetail", "mentorTiger", "privacy", "cookies", "terms", "legalNotice", "construction"];
+export declare const ROUTE_IDS: readonly ["home", "lote", "loteCheck", "loteNotify", "loteNotifyConfirmed", "loteProvince", "citaPrevia", "citaPreviaAll", "citaPreviaBook", "citaAlerts", "citaPreviaProvince", "citaProvinceReport", "citaWeeklyArchive", "citaPreviaOffice", "pausedOffices", "topicsIndex", "hubTieCardRenewal", "hubResidenceRenewal", "hubFamilyReunification", "hubInvitationLetter", "hubClave", "guidesIndex", "guideDetail", "invitesIndex", "inviteDetail", "mentorsIndex", "lifeIndex", "lifeHave", "lifeNeed", "lifeHaveDetail", "lifeNeedDetail", "mentorTiger", "privacy", "cookies", "terms", "legalNotice", "construction"];
 export type RouteId = (typeof ROUTE_IDS)[number];
 export interface RouteDefinition {
     readonly id: RouteId;
