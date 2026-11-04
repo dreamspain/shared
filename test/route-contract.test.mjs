@@ -38,8 +38,8 @@ function throws(fn, message) {
 // The mandated source registry currently declares 33 IDs; this is a
 // fidelity guard so unknown routes are never invented by the producer package.
 test("exports the complete source manifest and explicit legacy dispositions", () => {
-  assert.equal(ROUTE_IDS.length, 37);
-  assert.equal(Object.keys(ROUTES).length, 37);
+  assert.equal(ROUTE_IDS.length, 38);
+  assert.equal(Object.keys(ROUTES).length, 38);
   assert.deepEqual(LOCALES, ["en", "es", "fr", "ru", "zh", "ar"]);
   assert.deepEqual(
     LEGACY_ROUTES,
@@ -74,21 +74,21 @@ test("exports the complete source manifest and explicit legacy dispositions", ()
       { match: "exact", path: "/ar/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "tasa-790-012-invitation" } },
       { match: "exact", path: "/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "en" },
       { match: "exact", path: "/cita-previa/madrid/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "en", params: { province: "madrid" } },
-      { match: "exact", path: "/cita-previa/alicante/elche/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "en", params: { province: "alicante", office: "elche" } },
-      { match: "exact", path: "/cita-previa/alicante/alicante/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "en", params: { province: "alicante", office: "alicante" } },
-      { match: "exact", path: "/cita-previa/murcia/lorca/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "en", params: { province: "murcia", office: "lorca" } },
-      { match: "exact", path: "/cita-previa/girona/lloret-de-mar/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "en", params: { province: "girona", office: "lloret-de-mar" } },
-      { match: "exact", path: "/es/cita-previa/murcia/yecla/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "es", params: { province: "murcia", office: "yecla" } },
-      { match: "exact", path: "/es/cita-previa/alicante/orihuela/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "es", params: { province: "alicante", office: "orihuela" } },
-      { match: "exact", path: "/es/cita-previa/murcia/lorca/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "es", params: { province: "murcia", office: "lorca" } },
-      { match: "exact", path: "/es/cita-previa/ciudad-real/tomelloso/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "es", params: { province: "ciudad-real", office: "tomelloso" } },
-      { match: "exact", path: "/es/cita-previa/murcia/molina-de-segura/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "es", params: { province: "murcia", office: "molina-de-segura" } },
-      { match: "exact", path: "/es/cita-previa/barcelona/viladecans/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "es", params: { province: "barcelona", office: "viladecans" } },
-      { match: "exact", path: "/es/cita-previa/alicante/elda/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "es", params: { province: "alicante", office: "elda" } },
+      { match: "exact", path: "/cita-previa/alicante/elche/", action: "redirect", status: 301, to: "loteOffice", locale: "en", params: { province: "alicante", office: "elche" } },
+      { match: "exact", path: "/cita-previa/alicante/alicante/", action: "redirect", status: 301, to: "loteOffice", locale: "en", params: { province: "alicante", office: "alicante" } },
+      { match: "exact", path: "/cita-previa/murcia/lorca/", action: "redirect", status: 301, to: "loteOffice", locale: "en", params: { province: "murcia", office: "lorca" } },
+      { match: "exact", path: "/cita-previa/girona/lloret-de-mar/", action: "redirect", status: 301, to: "loteOffice", locale: "en", params: { province: "girona", office: "lloret-de-mar" } },
+      { match: "exact", path: "/es/cita-previa/murcia/yecla/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "murcia", office: "yecla" } },
+      { match: "exact", path: "/es/cita-previa/alicante/orihuela/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "alicante", office: "orihuela" } },
+      { match: "exact", path: "/es/cita-previa/murcia/lorca/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "murcia", office: "lorca" } },
+      { match: "exact", path: "/es/cita-previa/ciudad-real/tomelloso/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "ciudad-real", office: "tomelloso" } },
+      { match: "exact", path: "/es/cita-previa/murcia/molina-de-segura/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "murcia", office: "molina-de-segura" } },
+      { match: "exact", path: "/es/cita-previa/barcelona/viladecans/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "barcelona", office: "viladecans" } },
+      { match: "exact", path: "/es/cita-previa/alicante/elda/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "alicante", office: "elda" } },
       { match: "exact", path: "/es/cita-previa/barcelona/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "es", params: { province: "barcelona" } },
       { match: "exact", path: "/es/cita-previa/tarragona/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "es", params: { province: "tarragona" } },
-      { match: "exact", path: "/es/cita-previa/salamanca/salamanca/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "es", params: { province: "salamanca", office: "salamanca" } },
-      { match: "exact", path: "/es/cita-previa/girona/lloret-de-mar/", action: "redirect", status: 301, to: "citaPreviaOffice", locale: "es", params: { province: "girona", office: "lloret-de-mar" } },
+      { match: "exact", path: "/es/cita-previa/salamanca/salamanca/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "salamanca", office: "salamanca" } },
+      { match: "exact", path: "/es/cita-previa/girona/lloret-de-mar/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "girona", office: "lloret-de-mar" } },
       { match: "exact", path: "/es/cita-previa/madrid/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "es", params: { province: "madrid" } },
       { match: "exact", path: "/fr/cita-previa/all/", action: "redirect", status: 301, to: "citaPreviaAll", locale: "fr" },
       { match: "exact", path: "/fr/cita-previa/zaragoza/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "fr", params: { province: "zaragoza" } },
@@ -165,6 +165,15 @@ test("matches only active, raw-slug route paths", () => {
   assert.equal(matchRoute("/lote/check/").route.id, "loteCheck");
   assert.equal(matchRoute("/zh/lote/notify/").route.id, "loteNotify");
   assert.equal(pathFor("loteProvince", "en", { province: "madrid" }), "/lote/madrid/");
+  assert.deepEqual(matchRoute("/es/lote/madrid/avenida-de-los-poblados/"), {
+    route: ROUTES.loteOffice,
+    locale: "es",
+    params: { province: "madrid", office: "avenida-de-los-poblados" },
+  });
+  // The three-segment static sibling stays ahead of the office entity.
+  assert.equal(matchRoute("/lote/notify/confirmed/").route.id, "loteNotifyConfirmed");
+  assert.equal(pathFor("loteOffice", "en", { province: "madrid", office: "alcorcon" }), "/lote/madrid/alcorcon/");
+  assert.equal(matchRoute("/cita/madrid/alcorcon/").route.id, "citaPreviaOffice");
   assert.deepEqual(matchRoute("/fr/privacy/"), {
     route: ROUTES.privacy,
     locale: "fr",
@@ -288,7 +297,7 @@ test("pins the compiler and packs exactly the public package surface", () => {
 test("cita-previa → cita: GSC URLs 301 to the renamed route, the rest of the old tree is 404", () => {
   assert.equal(pathFor("citaPrevia", "es"), "/es/cita/");
   assert.equal(pathFor("citaPreviaOffice", "en", { province: "murcia", office: "yecla" }), "/cita/murcia/yecla/");
-  assert.deepEqual(resolveLegacyPath("/es/cita-previa/murcia/yecla/"), { action: "redirect", status: 301, targetPath: "/es/cita/murcia/yecla/" });
+  assert.deepEqual(resolveLegacyPath("/es/cita-previa/murcia/yecla/"), { action: "redirect", status: 301, targetPath: "/es/lote/murcia/yecla/" });
   assert.deepEqual(resolveLegacyPath("/cita-previa/"), { action: "redirect", status: 301, targetPath: "/cita/" });
   assert.deepEqual(resolveLegacyPath("/fr/cita-previa/all/"), { action: "redirect", status: 301, targetPath: "/fr/cita/all/" });
   assert.deepEqual(resolveLegacyPath("/es/cita-previa/"), { action: "notFound", status: 404 });
