@@ -38,8 +38,8 @@ function throws(fn, message) {
 // The mandated source registry currently declares 33 IDs; this is a
 // fidelity guard so unknown routes are never invented by the producer package.
 test("exports the complete source manifest and explicit legacy dispositions", () => {
-  assert.equal(ROUTE_IDS.length, 35);
-  assert.equal(Object.keys(ROUTES).length, 35);
+  assert.equal(ROUTE_IDS.length, 36);
+  assert.equal(Object.keys(ROUTES).length, 36);
   assert.deepEqual(LOCALES, ["en", "es", "fr", "ru", "zh", "ar"]);
   assert.deepEqual(
     LEGACY_ROUTES,
@@ -156,6 +156,15 @@ test("matches only active, raw-slug route paths", () => {
     locale: "es",
     params: {},
   });
+  assert.deepEqual(matchRoute("/es/lote/madrid/"), {
+    route: ROUTES.loteProvince,
+    locale: "es",
+    params: { province: "madrid" },
+  });
+  // Static lote siblings stay ahead of the province entity.
+  assert.equal(matchRoute("/lote/check/").route.id, "loteCheck");
+  assert.equal(matchRoute("/zh/lote/notify/").route.id, "loteNotify");
+  assert.equal(pathFor("loteProvince", "en", { province: "madrid" }), "/lote/madrid/");
   assert.deepEqual(matchRoute("/fr/privacy/"), {
     route: ROUTES.privacy,
     locale: "fr",

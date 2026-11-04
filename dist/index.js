@@ -11,7 +11,7 @@ function deepFreeze(value) {
 }
 export const LOCALES = deepFreeze(["en", "es", "fr", "ru", "zh", "ar"]);
 export const ROUTE_IDS = deepFreeze([
-    "home", "lote", "loteCheck", "loteNotify", "loteNotifyConfirmed",
+    "home", "lote", "loteCheck", "loteNotify", "loteNotifyConfirmed", "loteProvince",
     "citaPrevia", "citaPreviaAll", "citaPreviaBook", "citaAlerts", "citaPreviaProvince",
     "citaProvinceReport", "citaWeeklyArchive", "citaPreviaOffice",
     "pausedOffices", "topicsIndex", "hubTieCardRenewal", "hubResidenceRenewal",
@@ -29,11 +29,14 @@ export const ROUTES = deepFreeze({
     loteCheck: { id: "loteCheck", kind: "static", slug: "lote/check", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", scltSlug: "tie/consultar", deepLink: true },
     loteNotify: { id: "loteNotify", kind: "static", slug: "lote/notify", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     loteNotifyConfirmed: { id: "loteNotifyConfirmed", kind: "static", slug: "lote/notify/confirmed", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
+    // Province lote progress (2026-11-04): split off /cita/:province/, which keeps appointment detections only.
+    // sclt.es/tie/:province/ serves the same lote content, so its scltSlug moved here.
+    loteProvince: { id: "loteProvince", kind: "entity", slug: "lote/:province", params: ["province"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", scltSlug: "tie/:province", deepLink: false },
     citaPrevia: { id: "citaPrevia", kind: "static", slug: "cita", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     citaPreviaAll: { id: "citaPreviaAll", kind: "static", slug: "cita/all", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     citaPreviaBook: { id: "citaPreviaBook", kind: "static", slug: "cita/book", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
     citaAlerts: { id: "citaAlerts", kind: "static", slug: "cita/avisos", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
-    citaPreviaProvince: { id: "citaPreviaProvince", kind: "entity", slug: "cita/:province", params: ["province"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", scltSlug: "tie/:province", deepLink: false },
+    citaPreviaProvince: { id: "citaPreviaProvince", kind: "entity", slug: "cita/:province", params: ["province"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", deepLink: false },
     citaProvinceReport: { id: "citaProvinceReport", kind: "entity", slug: "cita/:province/informe", params: ["province"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", scltSlug: "tie/:province/informe", deepLink: false },
     citaWeeklyArchive: { id: "citaWeeklyArchive", kind: "entity", slug: "cita/informe/:week", params: ["week"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", deepLink: false },
     citaPreviaOffice: { id: "citaPreviaOffice", kind: "entity", slug: "cita/:province/:office", params: ["province", "office"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", scltSlug: "tie/:province/:office", deepLink: false },
