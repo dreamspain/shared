@@ -17,6 +17,7 @@ export const ROUTE_IDS = deepFreeze([
     "pausedOffices", "topicsIndex", "hubTieCardRenewal", "hubResidenceRenewal",
     "hubFamilyReunification", "hubInvitationLetter", "guidesIndex", "guideDetail",
     "invitesIndex", "inviteDetail", "mentorsIndex", "lifeIndex", "lifeHave", "lifeNeed",
+    "lifeHaveDetail", "lifeNeedDetail",
     "mentorTiger", "privacy", "cookies", "terms", "legalNotice", "construction",
 ]);
 export const TIEHOY_ORIGIN = "https://tiehoy.com";
@@ -50,6 +51,8 @@ export const ROUTES = deepFreeze({
     lifeIndex: { id: "lifeIndex", kind: "static", slug: "life", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     lifeHave: { id: "lifeHave", kind: "static", slug: "life/have", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     lifeNeed: { id: "lifeNeed", kind: "static", slug: "life/need", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
+    lifeHaveDetail: { id: "lifeHaveDetail", kind: "entity", slug: "life/have/:id", params: ["id"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", deepLink: false },
+    lifeNeedDetail: { id: "lifeNeedDetail", kind: "entity", slug: "life/need/:id", params: ["id"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", deepLink: false },
     mentorTiger: { id: "mentorTiger", kind: "static", slug: "mentors/tiger", defaultLocale: "zh", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     privacy: { id: "privacy", kind: "static", slug: "privacy", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     cookies: { id: "cookies", kind: "static", slug: "cookies", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },

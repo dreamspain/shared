@@ -38,8 +38,8 @@ function throws(fn, message) {
 // The mandated source registry currently declares 33 IDs; this is a
 // fidelity guard so unknown routes are never invented by the producer package.
 test("exports the complete source manifest and explicit legacy dispositions", () => {
-  assert.equal(ROUTE_IDS.length, 33);
-  assert.equal(Object.keys(ROUTES).length, 33);
+  assert.equal(ROUTE_IDS.length, 35);
+  assert.equal(Object.keys(ROUTES).length, 35);
   assert.deepEqual(LOCALES, ["en", "es", "fr", "ru", "zh", "ar"]);
   assert.deepEqual(
     LEGACY_ROUTES,
@@ -303,4 +303,13 @@ test("weekly lote report routes: province report and weekly archive", () => {
   assert.equal(matchRoute("/cita/informe/2026-w44/")?.route.id ?? matchRoute("/cita/informe/2026-w44/")?.id, "citaWeeklyArchive");
   assert.equal(ROUTES.citaProvinceReport.indexability, "indexable");
   assert.equal(ROUTES.citaWeeklyArchive.indexability, "indexable");
+});
+
+test("life detail routes: city-code ids, both sides, all locales", () => {
+  assert.equal(pathFor("lifeHaveDetail", "en", { id: "alicante-a02" }), "/life/have/alicante-a02/");
+  assert.equal(pathFor("lifeNeedDetail", "zh", { id: "madrid-b10" }), "/zh/life/need/madrid-b10/");
+  assert.equal(canonicalFor("lifeHaveDetail", "es", { id: "santa-cruz-a00" }), "https://tiehoy.com/es/life/have/santa-cruz-a00/");
+  assert.equal(matchRoute("/fr/life/have/alicante-a02/")?.route.id, "lifeHaveDetail");
+  assert.equal(matchRoute("/life/have/")?.route.id, "lifeHave");
+  assert.equal(ROUTES.lifeHaveDetail.sitemap, "entity");
 });
