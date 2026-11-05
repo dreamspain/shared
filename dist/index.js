@@ -48,7 +48,7 @@ export const ROUTES = deepFreeze({
     hubFamilyReunification: { id: "hubFamilyReunification", kind: "static", slug: "topics/family-reunification", esSlug: "topics/reagrupacion-familiar", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: true },
     hubInvitationLetter: { id: "hubInvitationLetter", kind: "static", slug: "topics/invitation-letter", esSlug: "topics/carta-de-invitacion", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: true },
     hubClave: { id: "hubClave", kind: "static", slug: "topics/clave", esSlug: "topics/clave", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: true },
-    hubSelfEmployedTax: { id: "hubSelfEmployedTax", kind: "static", slug: "tax", esSlug: "impuestos", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
+    hubSelfEmployedTax: { id: "hubSelfEmployedTax", kind: "static", slug: "tax", esSlug: "impuestos", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     guidesIndex: { id: "guidesIndex", kind: "static", slug: "guides", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: true },
     guideDetail: { id: "guideDetail", kind: "entity", slug: "guides/:slug", params: ["slug"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", deepLink: true },
     invitesIndex: { id: "invitesIndex", kind: "static", slug: "invites", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },

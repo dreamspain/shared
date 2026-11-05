@@ -331,3 +331,12 @@ test("life detail routes: city-code ids, both sides, all locales", () => {
   assert.equal(matchRoute("/life/have/")?.route.id, "lifeHave");
   assert.equal(ROUTES.lifeHaveDetail.sitemap, "entity");
 });
+
+test("hubSelfEmployedTax is a public top-level hub at /tax/ (es /impuestos/)", () => {
+  assert.equal(pathFor("hubSelfEmployedTax", "en"), "/tax/");
+  assert.equal(pathFor("hubSelfEmployedTax", "es"), "/es/impuestos/");
+  assert.equal(pathFor("hubSelfEmployedTax", "zh"), "/zh/tax/");
+  assert.equal(ROUTES.hubSelfEmployedTax.indexability, "indexable");
+  assert.equal(ROUTES.hubSelfEmployedTax.sitemap, "static");
+  assert.equal(ROUTES.hubSelfEmployedTax.deepLink, false);
+});
