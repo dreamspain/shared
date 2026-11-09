@@ -1,0 +1,37 @@
+/*
+ * TIE Hoy design tokens — the single source of color, type and line values
+ * for tiehoy-web, the TIE Hoy extension and sclt.es TIE pages.
+ * Standard: drafts/80-tiehoy/09-页面视觉标准/SCLT_DESIGN_PRINCIPLES_v2.md
+ *
+ * Consumers reference these variables; they never repeat the hex values.
+ * Local aliases (e.g. --ink: var(--tie-ink)) are allowed while a codebase migrates.
+ */
+:root {
+  /* Surfaces (§9: paper is the only page background) */
+  --tie-paper: #fcfbf8;
+  --tie-wash: #f7f5f0;   /* semantic panels only (e.g. payment methods), never page background */
+
+  /* Text — every text color clears 4.5:1 on --tie-paper */
+  --tie-ink: #242321;    /* primary text, labels, values */
+  --tie-body: #575451;   /* secondary text, notes, inactive tabs */
+  --tie-muted: #6f6b66;  /* tertiary text */
+
+  /* Lines and quiet marks (non-text; 3:1 on paper) */
+  --tie-quiet: #8d8983;  /* field underline, placeholder, disabled value */
+  --tie-hair: #d8d5cf;   /* hairline separators */
+
+  /* Accent — attention budget (§4): ≤ 10 uses per page */
+  --tie-seal: #8a3f31;
+  --tie-orchid: #76506c;
+
+  /* Type (§3: serif upright = fact, small caps sans = label, italic serif numeral = chapter) */
+  --tie-serif: Georgia, "Times New Roman", serif;
+  --tie-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Arial, sans-serif;
+  --tie-label: 700 12px/1.45 Arial, sans-serif;
+}
+
+/* Browsers render disabled controls translucent (Chrome: select:disabled { opacity: .7 }).
+   Disabled state is shown by color, never by opacity. :where() keeps specificity at 0. */
+:where(input, select, textarea, button):disabled {
+  opacity: 1;
+}

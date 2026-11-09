@@ -290,7 +290,7 @@ test("pins the compiler and packs exactly the public package surface", () => {
   assert.equal(pack.length, 1);
   assert.deepEqual(
     pack[0].files.map((entry) => entry.path).sort(),
-    ["README.md", "dist/index.d.ts", "dist/index.js", "package.json"],
+    ["README.md", "design-tokens/tokens.css", "dist/index.d.ts", "dist/index.js", "package.json"],
   );
 });
 

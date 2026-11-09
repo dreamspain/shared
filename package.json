@@ -8,10 +8,12 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
-    }
+    },
+    "./design-tokens.css": "./design-tokens/tokens.css"
   },
   "types": "./dist/index.d.ts",
   "files": [
+    "design-tokens",
     "dist"
   ],
   "sideEffects": false,

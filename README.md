@@ -42,3 +42,11 @@ The resolver returns `null` for a string containing `?` or `#` so callers pass o
 Run `npm ci`, then `npm run check:dist` to rebuild with the pinned local TypeScript
 compiler and fail if committed `dist/` is stale. `npm test` validates the contract and
 `npm pack --dry-run` verifies the publish surface.
+
+## Design tokens
+
+`@dreamspain/tiehoy-route-contract/design-tokens.css` is the single source of color, type and line
+values for tiehoy-web, the TIE Hoy extension and sclt.es TIE pages (`design-tokens/tokens.css`).
+Consumers reference `--tie-*` variables and never repeat the hex values. The sheet also resets
+`:disabled` controls to `opacity: 1` — Chrome otherwise renders a disabled `<select>` at 0.7.
+Standard: `drafts/80-tiehoy/09-页面视觉标准/SCLT_DESIGN_PRINCIPLES_v2.md`.
