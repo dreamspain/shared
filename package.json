@@ -34,6 +34,15 @@
     "node": ">=18"
   },
   "bin": {
-    "tiehoy-check-css": "design-tokens/check-css.mjs"
+    "tiehoy-check-css": "design-tokens/check-css.mjs",
+    "tiehoy-live-clarity": "design-tokens/live-gate.mjs"
+  },
+  "peerDependencies": {
+    "@playwright/test": ">=1.40"
+  },
+  "peerDependenciesMeta": {
+    "@playwright/test": {
+      "optional": true
+    }
   }
 }
