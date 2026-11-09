@@ -50,3 +50,13 @@ values for tiehoy-web, the TIE Hoy extension and sclt.es TIE pages (`design-toke
 Consumers reference `--tie-*` variables and never repeat the hex values. The sheet also resets
 `:disabled` controls to `opacity: 1` — Chrome otherwise renders a disabled `<select>` at 0.7.
 Standard: `drafts/80-tiehoy/09-页面视觉标准/SCLT_DESIGN_PRINCIPLES_v2.md`.
+
+## Visual clarity gate
+
+`design-tokens/check-css.mjs` (bin `tiehoy-check-css`) is the one rule set every consumer runs on its CSS:
+no translucent layers (opacity between 0 and 1 outside :hover/:active/:focus and @keyframes), no
+background gradients, no blur/backdrop-filter/blend modes, no translucent backgrounds, and color
+literals outside the tokens sheet may only go down. Existing violations sit in each repo's baseline
+JSON; counts may fall, never rise.
+
+    node node_modules/@dreamspain/tiehoy-route-contract/design-tokens/check-css.mjs --baseline visual-baseline.json <css files>

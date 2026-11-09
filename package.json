@@ -9,7 +9,8 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./design-tokens.css": "./design-tokens/tokens.css"
+    "./design-tokens.css": "./design-tokens/tokens.css",
+    "./check-css": "./design-tokens/check-css.mjs"
   },
   "types": "./dist/index.d.ts",
   "files": [
@@ -30,5 +31,8 @@
   "license": "UNLICENSED",
   "engines": {
     "node": ">=18"
+  },
+  "bin": {
+    "tiehoy-check-css": "design-tokens/check-css.mjs"
   }
 }
