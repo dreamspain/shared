@@ -10,7 +10,8 @@
       "default": "./dist/index.js"
     },
     "./design-tokens.css": "./design-tokens/tokens.css",
-    "./check-css": "./design-tokens/check-css.mjs"
+    "./check-css": "./design-tokens/check-css.mjs",
+    "./clarity-probe": "./design-tokens/clarity-probe.mjs"
   },
   "types": "./dist/index.d.ts",
   "files": [
