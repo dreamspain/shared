@@ -38,8 +38,8 @@ function throws(fn, message) {
 // The mandated source registry currently declares 33 IDs; this is a
 // fidelity guard so unknown routes are never invented by the producer package.
 test("exports the complete source manifest and explicit legacy dispositions", () => {
-  assert.equal(ROUTE_IDS.length, 39);
-  assert.equal(Object.keys(ROUTES).length, 39);
+  assert.equal(ROUTE_IDS.length, 40);
+  assert.equal(Object.keys(ROUTES).length, 40);
   assert.deepEqual(LOCALES, ["en", "es", "fr", "ru", "zh", "ar"]);
   assert.deepEqual(
     LEGACY_ROUTES,
@@ -101,7 +101,7 @@ test("exports the complete source manifest and explicit legacy dispositions", ()
       { match: "prefix", path: "/ar/cita-previa/", action: "notFound", status: 404 },
     ],
   );
-  for (const id of ["privacy", "cookies", "terms", "legalNotice"]) {
+  for (const id of ["privacy", "cookies", "terms", "legalNotice", "contact"]) {
     assert.deepEqual(ROUTES[id].activeLocales, LOCALES, `${id} must remain public in all live locales`);
   }
   assert.deepEqual(validateManifest(), []);

@@ -22,7 +22,7 @@ export const ROUTE_IDS = deepFreeze([
   "hubFamilyReunification", "hubInvitationLetter", "hubClave", "hubSelfEmployedTax", "guidesIndex", "guideDetail",
   "invitesIndex", "inviteDetail", "mentorsIndex", "lifeIndex", "lifeHave", "lifeNeed",
   "lifeHaveDetail", "lifeNeedDetail",
-  "mentorTiger", "privacy", "cookies", "terms", "legalNotice", "construction",
+  "mentorTiger", "privacy", "cookies", "terms", "legalNotice", "contact", "construction",
 ] as const);
 export type RouteId = (typeof ROUTE_IDS)[number];
 
@@ -129,6 +129,7 @@ export const ROUTES: Readonly<Record<RouteId, RouteDefinition>> = deepFreeze({
   cookies: { id: "cookies", kind: "static", slug: "cookies", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
   terms: { id: "terms", kind: "static", slug: "terms", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
   legalNotice: { id: "legalNotice", kind: "static", slug: "legal-notice", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
+  contact: { id: "contact", kind: "static", slug: "contact", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
   construction: { id: "construction", kind: "static", slug: "construction", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
 });
 
