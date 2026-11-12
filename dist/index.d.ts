@@ -50,15 +50,14 @@ export interface LegacyRedirectRoute {
 /** A historical path policy with explicit matching and HTTP semantics. */
 export type LegacyRoute = LegacyNotFoundRoute | LegacyGoneRoute | LegacyRedirectRoute;
 /**
- * Rule-based legacy tree (RC10, zhiyi apply 2026-11-12): any locale, any slug — not a GSC snapshot.
- * `/{locale?}/{segment}/{province}/` and `/{locale?}/{segment}/{province}/{office}/` map to `to`.
- * An office rule names `fallback` (the province route) and `officeLookup` (the page whose office
- * resolver decides existence); the Worker adapter resolves the office and uses `fallbackPath` when
- * the resolver answers 404. The reserved province slug `all` maps to `allTo`.
+ * Rule-based legacy URLs (RC10/RC8, zhiyi apply 2026-11-12): any locale, any slug — not a GSC snapshot.
+ * `pattern` is the locale-less old path: literal segments plus `:param` segments (raw slugs) that feed `to`.
+ * An office rule names `fallback` (the province route) and `officeLookup` (the page whose office resolver
+ * decides existence); the Worker adapter resolves the office and uses `fallbackPath` when it answers 404.
+ * A `:province` rule may name `allTo` for the reserved province slug `all`.
  */
 export interface LegacyPatternRoute {
-    readonly segment: string;
-    readonly params: readonly ("province" | "office")[];
+    readonly pattern: string;
     readonly to: RouteId;
     readonly fallback?: RouteId;
     readonly officeLookup?: "cita" | "lote";

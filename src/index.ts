@@ -79,15 +79,14 @@ export interface LegacyRedirectRoute {
 export type LegacyRoute = LegacyNotFoundRoute | LegacyGoneRoute | LegacyRedirectRoute;
 
 /**
- * Rule-based legacy tree (RC10, zhiyi apply 2026-11-12): any locale, any slug — not a GSC snapshot.
- * `/{locale?}/{segment}/{province}/` and `/{locale?}/{segment}/{province}/{office}/` map to `to`.
- * An office rule names `fallback` (the province route) and `officeLookup` (the page whose office
- * resolver decides existence); the Worker adapter resolves the office and uses `fallbackPath` when
- * the resolver answers 404. The reserved province slug `all` maps to `allTo`.
+ * Rule-based legacy URLs (RC10/RC8, zhiyi apply 2026-11-12): any locale, any slug — not a GSC snapshot.
+ * `pattern` is the locale-less old path: literal segments plus `:param` segments (raw slugs) that feed `to`.
+ * An office rule names `fallback` (the province route) and `officeLookup` (the page whose office resolver
+ * decides existence); the Worker adapter resolves the office and uses `fallbackPath` when it answers 404.
+ * A `:province` rule may name `allTo` for the reserved province slug `all`.
  */
 export interface LegacyPatternRoute {
-  readonly segment: string;
-  readonly params: readonly ("province" | "office")[];
+  readonly pattern: string;
   readonly to: RouteId;
   readonly fallback?: RouteId;
   readonly officeLookup?: "cita" | "lote";
@@ -124,8 +123,8 @@ export const ROUTES: Readonly<Record<RouteId, RouteDefinition>> = deepFreeze({
   citaPreviaBook: { id: "citaPreviaBook", kind: "static", slug: "cita/book", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
   citaAlerts: { id: "citaAlerts", kind: "static", slug: "cita/avisos", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
   citaPreviaProvince: { id: "citaPreviaProvince", kind: "entity", slug: "cita/:province", params: ["province"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", deepLink: false },
-  citaProvinceReport: { id: "citaProvinceReport", kind: "entity", slug: "cita/:province/informe", params: ["province"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", scltSlug: "tie/:province/informe", deepLink: false },
-  citaWeeklyArchive: { id: "citaWeeklyArchive", kind: "entity", slug: "cita/informe/:week", params: ["week"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", deepLink: false },
+  citaProvinceReport: { id: "citaProvinceReport", kind: "entity", slug: "lote/:province/informe", params: ["province"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", scltSlug: "tie/:province/informe", deepLink: false },
+  citaWeeklyArchive: { id: "citaWeeklyArchive", kind: "entity", slug: "lote/informe/:week", params: ["week"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", deepLink: false },
   citaPreviaOffice: { id: "citaPreviaOffice", kind: "entity", slug: "cita/:province/:office", params: ["province", "office"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", deepLink: false },
   pausedOffices: { id: "pausedOffices", kind: "static", slug: "offices/paused", esSlug: "oficinas/pausadas", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
   topicsIndex: { id: "topicsIndex", kind: "static", slug: "topics", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: true },
@@ -204,34 +203,52 @@ export const LEGACY_ROUTES: readonly LegacyRoute[] = deepFreeze<LegacyRoute[]>([
 
 export const LEGACY_PATTERNS: readonly LegacyPatternRoute[] = deepFreeze<LegacyPatternRoute[]>([
   // /oficina/ was replaced by /cita/ (zhiyi 2026-11-12).
-  { segment: "oficina", params: ["province", "office"], to: "citaPreviaOffice", fallback: "citaPreviaProvince", officeLookup: "cita" },
-  { segment: "oficina", params: ["province"], to: "citaPreviaProvince", allTo: "citaPreviaAll" },
+  { pattern: "/oficina/:province/:office/", to: "citaPreviaOffice", fallback: "citaPreviaProvince", officeLookup: "cita" },
+  { pattern: "/oficina/:province/", to: "citaPreviaProvince", allTo: "citaPreviaAll" },
   // /cita-previa/ office pages carried lote content (2026-11-04 split): office → lote, province → cita.
-  { segment: "cita-previa", params: ["province", "office"], to: "loteOffice", fallback: "loteProvince", officeLookup: "lote" },
-  { segment: "cita-previa", params: ["province"], to: "citaPreviaProvince", allTo: "citaPreviaAll" },
+  { pattern: "/cita-previa/:province/:office/", to: "loteOffice", fallback: "loteProvince", officeLookup: "lote" },
+  { pattern: "/cita-previa/:province/", to: "citaPreviaProvince", allTo: "citaPreviaAll" },
+  // The weekly lote reports moved from /cita/ to /lote/ (RC8, 2026-11-12); the route IDs keep their identity.
+  { pattern: "/cita/:province/informe/", to: "citaProvinceReport" },
+  { pattern: "/cita/informe/:week/", to: "citaWeeklyArchive" },
 ]);
 
-function resolveLegacyPattern(pathname: string): LegacyPathResolution | null {
-  const m = /^\/(?:([a-z]{2})\/)?([a-z-]+)\/([^/]+)\/(?:([^/]+)\/)?$/.exec(pathname);
-  if (!m) return null;
-  const [, prefix, segment, province, office] = m;
-  const locale = (prefix ?? "en") as Locale;
-  if (prefix === "en" || !LOCALES.includes(locale)) return null;
-  if (!RAW_SLUG.test(province) || (office !== undefined && !RAW_SLUG.test(office))) return null;
-  const depth = office === undefined ? 1 : 2;
-  const rule = LEGACY_PATTERNS.find((r) => r.segment === segment && r.params.length === depth);
-  if (!rule) return null;
-  if (depth === 1 && province === "all" && rule.allTo) {
-    return deepFreeze({ action: "redirect" as const, status: 301 as const, targetPath: pathFor(rule.allTo, locale) });
+function matchLegacyPattern(pattern: string, rest: string): Record<string, string> | null {
+  const want = pattern.split("/").filter(Boolean);
+  const got = rest.split("/").filter(Boolean);
+  if (want.length !== got.length) return null;
+  const params: Record<string, string> = {};
+  for (let i = 0; i < want.length; i++) {
+    if (want[i].startsWith(":")) {
+      if (!RAW_SLUG.test(got[i])) return null;
+      params[want[i].slice(1)] = got[i];
+    } else if (want[i] !== got[i]) return null;
   }
-  const params: Record<string, string> = depth === 2 ? { province, office: office! } : { province };
-  const targetPath = pathFor(rule.to, locale, params);
-  if (!rule.fallback || !rule.officeLookup) return deepFreeze({ action: "redirect" as const, status: 301 as const, targetPath });
-  return deepFreeze({
-    action: "redirect" as const, status: 301 as const, targetPath,
-    fallbackPath: pathFor(rule.fallback, locale, { province }),
-    officeLookup: { page: rule.officeLookup, province, office: office! },
-  });
+  return params;
+}
+
+function resolveLegacyPattern(pathname: string): LegacyPathResolution | null {
+  if (!pathname.endsWith("/")) return null;
+  const m = /^\/([a-z]{2})(\/.*)$/.exec(pathname);
+  if (m?.[1] === "en") return null;
+  const prefixed = m !== null && LOCALES.includes(m[1] as Locale);
+  const locale = (prefixed ? m![1] : "en") as Locale;
+  const rest = prefixed ? m![2] : pathname;
+  for (const rule of LEGACY_PATTERNS) {
+    const params = matchLegacyPattern(rule.pattern, rest);
+    if (!params) continue;
+    if (rule.allTo && params.province === "all") {
+      return deepFreeze({ action: "redirect" as const, status: 301 as const, targetPath: pathFor(rule.allTo, locale) });
+    }
+    const targetPath = pathFor(rule.to, locale, params);
+    if (!rule.fallback || !rule.officeLookup) return deepFreeze({ action: "redirect" as const, status: 301 as const, targetPath });
+    return deepFreeze({
+      action: "redirect" as const, status: 301 as const, targetPath,
+      fallbackPath: pathFor(rule.fallback, locale, { province: params.province }),
+      officeLookup: { page: rule.officeLookup, province: params.province, office: params.office },
+    });
+  }
+  return null;
 }
 
 const RAW_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -384,6 +401,9 @@ export function matchRoute(path: string): RouteMatch | null {
   if (normalized.includes("//")) return null;
   const inputSegments = normalized === "/" ? [] : normalized.slice(1, -1).split("/");
 
+  // Most literal segments wins, like React Router's ranking: /lote/x/informe/ is the report, not an office
+  // named "informe". Ties keep declaration order.
+  let best: { match: RouteMatch; literals: number } | null = null;
   for (const id of ROUTE_IDS) {
     const route = ROUTES[id];
     for (const locale of route.activeLocales) {
@@ -401,10 +421,12 @@ export function matchRoute(path: string): RouteMatch | null {
           else params[expected.slice(1)] = actual;
         } else if (actual !== expected) matches = false;
       }
-      if (matches) return deepFreeze({ route, locale, params });
+      if (!matches) continue;
+      const literals = routeSegments.filter((seg) => !seg.startsWith(":")).length;
+      if (!best || literals > best.literals) best = { match: { route, locale, params }, literals };
     }
   }
-  return null;
+  return best ? deepFreeze(best.match) : null;
 }
 
 export function sitemapRoutes(): RouteDefinition[] {
@@ -448,11 +470,13 @@ export function validateManifest(): string[] {
   for (const key of Object.keys(ROUTES)) if (!ROUTE_IDS.includes(key as RouteId)) errors.push(`ROUTES contains undeclared route ${JSON.stringify(key)}`);
   for (const rule of LEGACY_PATTERNS) {
     const target = ROUTES[rule.to];
-    if (!target) errors.push(`Legacy pattern ${rule.segment} references unknown target`);
-    else if ([...(target.params ?? [])].sort().join() !== [...rule.params].sort().join()) errors.push(`Legacy pattern ${rule.segment}/${rule.params.join("/")} params differ from ${rule.to}`);
-    if (rule.fallback && (ROUTES[rule.fallback]?.params ?? []).join() !== "province") errors.push(`Legacy pattern ${rule.segment} fallback must take only province`);
-    if (Boolean(rule.fallback) !== Boolean(rule.officeLookup) || (rule.officeLookup && rule.params.length !== 2)) errors.push(`Legacy pattern ${rule.segment} fallback/officeLookup apply to office rules together`);
-    if (rule.allTo && (ROUTES[rule.allTo]?.params ?? []).length) errors.push(`Legacy pattern ${rule.segment} allTo must be static`);
+    const params = rule.pattern.split("/").filter((seg) => seg.startsWith(":")).map((seg) => seg.slice(1));
+    if (!rule.pattern.startsWith("/") || !rule.pattern.endsWith("/")) errors.push(`Legacy pattern ${rule.pattern} must start and end with /`);
+    if (!target) errors.push(`Legacy pattern ${rule.pattern} references unknown target`);
+    else if ([...(target.params ?? [])].sort().join() !== [...params].sort().join()) errors.push(`Legacy pattern ${rule.pattern} params differ from ${rule.to}`);
+    if (rule.fallback && (ROUTES[rule.fallback]?.params ?? []).join() !== "province") errors.push(`Legacy pattern ${rule.pattern} fallback must take only province`);
+    if (Boolean(rule.fallback) !== Boolean(rule.officeLookup) || (rule.officeLookup && !(params.includes("province") && params.includes("office")))) errors.push(`Legacy pattern ${rule.pattern} fallback/officeLookup apply to office rules together`);
+    if (rule.allTo && ((ROUTES[rule.allTo]?.params ?? []).length || !params.includes("province"))) errors.push(`Legacy pattern ${rule.pattern} allTo must be static on a province rule`);
   }
   for (const legacy of LEGACY_ROUTES) {
     const candidate = legacy as { match: string; path: string; action: string; status: number; to?: string; locale?: string };

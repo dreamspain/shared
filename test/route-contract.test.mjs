@@ -317,12 +317,16 @@ test("citaAlerts is a noindex static page under /cita/avisos/", () => {
 });
 
 test("weekly lote report routes: province report and weekly archive", () => {
-  assert.equal(pathFor("citaProvinceReport", "es", { province: "madrid" }), "/es/cita/madrid/informe/");
-  assert.equal(pathFor("citaProvinceReport", "en", { province: "madrid" }), "/cita/madrid/informe/");
-  assert.equal(pathFor("citaWeeklyArchive", "es", { week: "2026-w44" }), "/es/cita/informe/2026-w44/");
-  assert.equal(pathFor("citaWeeklyArchive", "zh", { week: "2026-w44" }), "/zh/cita/informe/2026-w44/");
-  assert.equal(matchRoute("/es/cita/madrid/informe/")?.route.id ?? matchRoute("/es/cita/madrid/informe/")?.id, "citaProvinceReport");
-  assert.equal(matchRoute("/cita/informe/2026-w44/")?.route.id ?? matchRoute("/cita/informe/2026-w44/")?.id, "citaWeeklyArchive");
+  assert.equal(pathFor("citaProvinceReport", "es", { province: "madrid" }), "/es/lote/madrid/informe/");
+  assert.equal(pathFor("citaProvinceReport", "en", { province: "madrid" }), "/lote/madrid/informe/");
+  assert.equal(pathFor("citaWeeklyArchive", "es", { week: "2026-w44" }), "/es/lote/informe/2026-w44/");
+  assert.equal(pathFor("citaWeeklyArchive", "zh", { week: "2026-w44" }), "/zh/lote/informe/2026-w44/");
+  assert.equal(matchRoute("/es/lote/madrid/informe/")?.route.id ?? matchRoute("/es/lote/madrid/informe/")?.id, "citaProvinceReport");
+  // RC8 (2026-11-12): the old /cita/ report URLs 301 to /lote/ in every locale.
+  assert.deepEqual(resolveLegacyPath("/es/cita/madrid/informe/"), { action: "redirect", status: 301, targetPath: "/es/lote/madrid/informe/" });
+  assert.deepEqual(resolveLegacyPath("/cita/informe/2026-w44/"), { action: "redirect", status: 301, targetPath: "/lote/informe/2026-w44/" });
+  assert.equal(resolveLegacyPath("/cita/madrid/getafe/"), null, "live cita office pages are not legacy");
+  assert.equal(matchRoute("/lote/informe/2026-w44/")?.route.id ?? matchRoute("/lote/informe/2026-w44/")?.id, "citaWeeklyArchive");
   assert.equal(ROUTES.citaProvinceReport.indexability, "indexable");
   assert.equal(ROUTES.citaWeeklyArchive.indexability, "indexable");
 });
