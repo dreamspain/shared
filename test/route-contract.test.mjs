@@ -73,26 +73,6 @@ test("exports the complete source manifest and explicit legacy dispositions", ()
       { match: "exact", path: "/zh/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "tasa-790-012-invitation" } },
       { match: "exact", path: "/ar/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "tasa-790-012-invitation" } },
       { match: "exact", path: "/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "en" },
-      { match: "exact", path: "/cita-previa/madrid/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "en", params: { province: "madrid" } },
-      { match: "exact", path: "/cita-previa/alicante/elche/", action: "redirect", status: 301, to: "loteOffice", locale: "en", params: { province: "alicante", office: "elche" } },
-      { match: "exact", path: "/cita-previa/alicante/alicante/", action: "redirect", status: 301, to: "loteOffice", locale: "en", params: { province: "alicante", office: "alicante" } },
-      { match: "exact", path: "/cita-previa/murcia/lorca/", action: "redirect", status: 301, to: "loteOffice", locale: "en", params: { province: "murcia", office: "lorca" } },
-      { match: "exact", path: "/cita-previa/girona/lloret-de-mar/", action: "redirect", status: 301, to: "loteOffice", locale: "en", params: { province: "girona", office: "lloret-de-mar" } },
-      { match: "exact", path: "/es/cita-previa/murcia/yecla/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "murcia", office: "yecla" } },
-      { match: "exact", path: "/es/cita-previa/alicante/orihuela/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "alicante", office: "orihuela" } },
-      { match: "exact", path: "/es/cita-previa/murcia/lorca/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "murcia", office: "lorca" } },
-      { match: "exact", path: "/es/cita-previa/ciudad-real/tomelloso/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "ciudad-real", office: "tomelloso" } },
-      { match: "exact", path: "/es/cita-previa/murcia/molina-de-segura/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "murcia", office: "molina-de-segura" } },
-      { match: "exact", path: "/es/cita-previa/barcelona/viladecans/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "barcelona", office: "viladecans" } },
-      { match: "exact", path: "/es/cita-previa/alicante/elda/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "alicante", office: "elda" } },
-      { match: "exact", path: "/es/cita-previa/barcelona/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "es", params: { province: "barcelona" } },
-      { match: "exact", path: "/es/cita-previa/tarragona/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "es", params: { province: "tarragona" } },
-      { match: "exact", path: "/es/cita-previa/salamanca/salamanca/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "salamanca", office: "salamanca" } },
-      { match: "exact", path: "/es/cita-previa/girona/lloret-de-mar/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "girona", office: "lloret-de-mar" } },
-      { match: "exact", path: "/es/cita-previa/madrid/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "es", params: { province: "madrid" } },
-      { match: "exact", path: "/fr/cita-previa/all/", action: "redirect", status: 301, to: "citaPreviaAll", locale: "fr" },
-      { match: "exact", path: "/fr/cita-previa/zaragoza/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "fr", params: { province: "zaragoza" } },
-      { match: "exact", path: "/ru/cita-previa/malaga/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "ru", params: { province: "malaga" } },
       { match: "prefix", path: "/cita-previa/", action: "notFound", status: 404 },
       { match: "prefix", path: "/es/cita-previa/", action: "notFound", status: 404 },
       { match: "prefix", path: "/fr/cita-previa/", action: "notFound", status: 404 },
@@ -202,6 +182,24 @@ test("resolves legacy paths with explicit semantics without general normalizatio
   }
 
   assert.deepEqual(resolveLegacyPath("/tiger/"), { action: "redirect", status: 301, targetPath: "/mentors/tiger/" });
+  // RC10 (2026-11-12): /oficina/ and /cita-previa/ are rules, not a GSC snapshot.
+  assert.deepEqual(resolveLegacyPath("/es/oficina/barcelona/terrassa/"), {
+    action: "redirect", status: 301, targetPath: "/es/cita/barcelona/terrassa/",
+    fallbackPath: "/es/cita/barcelona/", officeLookup: { page: "cita", province: "barcelona", office: "terrassa" },
+  });
+  assert.deepEqual(resolveLegacyPath("/oficina/madrid/"), { action: "redirect", status: 301, targetPath: "/cita/madrid/" });
+  assert.deepEqual(resolveLegacyPath("/zh/cita-previa/zaragoza/"), { action: "redirect", status: 301, targetPath: "/zh/cita/zaragoza/" });
+  assert.deepEqual(resolveLegacyPath("/cita-previa/alicante/elche/"), {
+    action: "redirect", status: 301, targetPath: "/lote/alicante/elche/",
+    fallbackPath: "/lote/alicante/", officeLookup: { page: "lote", province: "alicante", office: "elche" },
+  });
+  assert.deepEqual(resolveLegacyPath("/fr/cita-previa/all/"), { action: "redirect", status: 301, targetPath: "/fr/cita/all/" });
+  assert.deepEqual(resolveLegacyPath("/cita-previa/"), { action: "redirect", status: 301, targetPath: "/cita/" });
+  assert.deepEqual(resolveLegacyPath("/es/oficina/"), null, "locale root of a retired tree has no rule and no es prefix entry");
+  assert.deepEqual(resolveLegacyPath("/oficina/"), { action: "notFound", status: 404 });
+  assert.deepEqual(resolveLegacyPath("/oficina/madrid/x/extra/"), { action: "notFound", status: 404 });
+  assert.deepEqual(resolveLegacyPath("/es/cita-previa/Madrid/"), { action: "notFound", status: 404 }, "unsafe slug falls to the prefix 404");
+  assert.equal(resolveLegacyPath("/en/oficina/madrid/"), null, "en has no locale prefix");
   assert.deepEqual(resolveLegacyPath("/es/tiger/"), { action: "redirect", status: 301, targetPath: "/es/mentors/tiger/" });
   assert.deepEqual(resolveLegacyPath("/zh/mentors/tiger/"), { action: "redirect", status: 301, targetPath: "/mentors/tiger/" });
   assert.equal(resolveLegacyPath("/es/tiger"), null, "exact alias must retain its slash requirement");
@@ -294,14 +292,20 @@ test("pins the compiler and packs exactly the public package surface", () => {
   );
 });
 
-test("cita-previa → cita: GSC URLs 301 to the renamed route, the rest of the old tree is 404", () => {
+test("cita-previa → cita: rules 301 every province/office URL; only unmatched shapes are 404", () => {
   assert.equal(pathFor("citaPrevia", "es"), "/es/cita/");
   assert.equal(pathFor("citaPreviaOffice", "en", { province: "murcia", office: "yecla" }), "/cita/murcia/yecla/");
-  assert.deepEqual(resolveLegacyPath("/es/cita-previa/murcia/yecla/"), { action: "redirect", status: 301, targetPath: "/es/lote/murcia/yecla/" });
+  assert.deepEqual(resolveLegacyPath("/es/cita-previa/murcia/yecla/"), {
+    action: "redirect", status: 301, targetPath: "/es/lote/murcia/yecla/",
+    fallbackPath: "/es/lote/murcia/", officeLookup: { page: "lote", province: "murcia", office: "yecla" },
+  });
   assert.deepEqual(resolveLegacyPath("/cita-previa/"), { action: "redirect", status: 301, targetPath: "/cita/" });
   assert.deepEqual(resolveLegacyPath("/fr/cita-previa/all/"), { action: "redirect", status: 301, targetPath: "/fr/cita/all/" });
   assert.deepEqual(resolveLegacyPath("/es/cita-previa/"), { action: "notFound", status: 404 });
-  assert.deepEqual(resolveLegacyPath("/zh/cita-previa/madrid/getafe/"), { action: "notFound", status: 404 });
+  assert.deepEqual(resolveLegacyPath("/zh/cita-previa/madrid/getafe/"), {
+    action: "redirect", status: 301, targetPath: "/zh/lote/madrid/getafe/",
+    fallbackPath: "/zh/lote/madrid/", officeLookup: { page: "lote", province: "madrid", office: "getafe" },
+  });
   assert.equal(matchRoute("/cita-previa/murcia/"), null, "old prefix is no longer a route");
 });
 

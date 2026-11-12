@@ -49,6 +49,21 @@ export interface LegacyRedirectRoute {
 }
 /** A historical path policy with explicit matching and HTTP semantics. */
 export type LegacyRoute = LegacyNotFoundRoute | LegacyGoneRoute | LegacyRedirectRoute;
+/**
+ * Rule-based legacy tree (RC10, zhiyi apply 2026-11-12): any locale, any slug — not a GSC snapshot.
+ * `/{locale?}/{segment}/{province}/` and `/{locale?}/{segment}/{province}/{office}/` map to `to`.
+ * An office rule names `fallback` (the province route) and `officeLookup` (the page whose office
+ * resolver decides existence); the Worker adapter resolves the office and uses `fallbackPath` when
+ * the resolver answers 404. The reserved province slug `all` maps to `allTo`.
+ */
+export interface LegacyPatternRoute {
+    readonly segment: string;
+    readonly params: readonly ("province" | "office")[];
+    readonly to: RouteId;
+    readonly fallback?: RouteId;
+    readonly officeLookup?: "cita" | "lote";
+    readonly allTo?: RouteId;
+}
 export type LegacyPathResolution = Readonly<{
     action: "notFound";
     status: 404;
@@ -59,6 +74,13 @@ export type LegacyPathResolution = Readonly<{
     action: "redirect";
     status: 301;
     targetPath: string;
+    /** Present only on office rules: where to go when the office resolver answers 404. */
+    fallbackPath?: string;
+    officeLookup?: Readonly<{
+        page: "cita" | "lote";
+        province: string;
+        office: string;
+    }>;
 }>;
 export declare const TIEHOY_ORIGIN = "https://tiehoy.com";
 export declare const SCLT_ORIGIN = "https://sclt.es";
@@ -70,6 +92,7 @@ export declare const ROUTES: Readonly<Record<RouteId, RouteDefinition>>;
  * required trailing slash. These are pathname-only policies.
  */
 export declare const LEGACY_ROUTES: readonly LegacyRoute[];
+export declare const LEGACY_PATTERNS: readonly LegacyPatternRoute[];
 /** Build an active, locale-aware route path. Dynamic params must be raw canonical slugs. */
 export declare function pathFor(id: RouteId | string, locale: Locale | string, params?: Readonly<Record<string, string>>): string;
 /**

@@ -104,28 +104,9 @@ export const LEGACY_ROUTES = deepFreeze([
     { match: "exact", path: "/ru/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ru", params: { slug: "tasa-790-012-invitation" } },
     { match: "exact", path: "/zh/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "tasa-790-012-invitation" } },
     { match: "exact", path: "/ar/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "tasa-790-012-invitation" } },
-    // cita-previa → cita (2026-10-28): GSC 28-day URLs with impressions → 301; the rest of the old tree → 404.
+    // cita-previa → cita (2026-10-28). Province/office URLs now go through LEGACY_PATTERNS (RC10, 2026-11-12);
+    // the prefix 404s below only catch what no rule matches.
     { match: "exact", path: "/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "en" },
-    { match: "exact", path: "/cita-previa/madrid/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "en", params: { province: "madrid" } },
-    { match: "exact", path: "/cita-previa/alicante/elche/", action: "redirect", status: 301, to: "loteOffice", locale: "en", params: { province: "alicante", office: "elche" } },
-    { match: "exact", path: "/cita-previa/alicante/alicante/", action: "redirect", status: 301, to: "loteOffice", locale: "en", params: { province: "alicante", office: "alicante" } },
-    { match: "exact", path: "/cita-previa/murcia/lorca/", action: "redirect", status: 301, to: "loteOffice", locale: "en", params: { province: "murcia", office: "lorca" } },
-    { match: "exact", path: "/cita-previa/girona/lloret-de-mar/", action: "redirect", status: 301, to: "loteOffice", locale: "en", params: { province: "girona", office: "lloret-de-mar" } },
-    { match: "exact", path: "/es/cita-previa/murcia/yecla/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "murcia", office: "yecla" } },
-    { match: "exact", path: "/es/cita-previa/alicante/orihuela/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "alicante", office: "orihuela" } },
-    { match: "exact", path: "/es/cita-previa/murcia/lorca/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "murcia", office: "lorca" } },
-    { match: "exact", path: "/es/cita-previa/ciudad-real/tomelloso/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "ciudad-real", office: "tomelloso" } },
-    { match: "exact", path: "/es/cita-previa/murcia/molina-de-segura/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "murcia", office: "molina-de-segura" } },
-    { match: "exact", path: "/es/cita-previa/barcelona/viladecans/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "barcelona", office: "viladecans" } },
-    { match: "exact", path: "/es/cita-previa/alicante/elda/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "alicante", office: "elda" } },
-    { match: "exact", path: "/es/cita-previa/barcelona/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "es", params: { province: "barcelona" } },
-    { match: "exact", path: "/es/cita-previa/tarragona/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "es", params: { province: "tarragona" } },
-    { match: "exact", path: "/es/cita-previa/salamanca/salamanca/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "salamanca", office: "salamanca" } },
-    { match: "exact", path: "/es/cita-previa/girona/lloret-de-mar/", action: "redirect", status: 301, to: "loteOffice", locale: "es", params: { province: "girona", office: "lloret-de-mar" } },
-    { match: "exact", path: "/es/cita-previa/madrid/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "es", params: { province: "madrid" } },
-    { match: "exact", path: "/fr/cita-previa/all/", action: "redirect", status: 301, to: "citaPreviaAll", locale: "fr" },
-    { match: "exact", path: "/fr/cita-previa/zaragoza/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "fr", params: { province: "zaragoza" } },
-    { match: "exact", path: "/ru/cita-previa/malaga/", action: "redirect", status: 301, to: "citaPreviaProvince", locale: "ru", params: { province: "malaga" } },
     { match: "prefix", path: "/cita-previa/", action: "notFound", status: 404 },
     { match: "prefix", path: "/es/cita-previa/", action: "notFound", status: 404 },
     { match: "prefix", path: "/fr/cita-previa/", action: "notFound", status: 404 },
@@ -133,6 +114,41 @@ export const LEGACY_ROUTES = deepFreeze([
     { match: "prefix", path: "/zh/cita-previa/", action: "notFound", status: 404 },
     { match: "prefix", path: "/ar/cita-previa/", action: "notFound", status: 404 },
 ]);
+export const LEGACY_PATTERNS = deepFreeze([
+    // /oficina/ was replaced by /cita/ (zhiyi 2026-11-12).
+    { segment: "oficina", params: ["province", "office"], to: "citaPreviaOffice", fallback: "citaPreviaProvince", officeLookup: "cita" },
+    { segment: "oficina", params: ["province"], to: "citaPreviaProvince", allTo: "citaPreviaAll" },
+    // /cita-previa/ office pages carried lote content (2026-11-04 split): office → lote, province → cita.
+    { segment: "cita-previa", params: ["province", "office"], to: "loteOffice", fallback: "loteProvince", officeLookup: "lote" },
+    { segment: "cita-previa", params: ["province"], to: "citaPreviaProvince", allTo: "citaPreviaAll" },
+]);
+function resolveLegacyPattern(pathname) {
+    const m = /^\/(?:([a-z]{2})\/)?([a-z-]+)\/([^/]+)\/(?:([^/]+)\/)?$/.exec(pathname);
+    if (!m)
+        return null;
+    const [, prefix, segment, province, office] = m;
+    const locale = (prefix ?? "en");
+    if (prefix === "en" || !LOCALES.includes(locale))
+        return null;
+    if (!RAW_SLUG.test(province) || (office !== undefined && !RAW_SLUG.test(office)))
+        return null;
+    const depth = office === undefined ? 1 : 2;
+    const rule = LEGACY_PATTERNS.find((r) => r.segment === segment && r.params.length === depth);
+    if (!rule)
+        return null;
+    if (depth === 1 && province === "all" && rule.allTo) {
+        return deepFreeze({ action: "redirect", status: 301, targetPath: pathFor(rule.allTo, locale) });
+    }
+    const params = depth === 2 ? { province, office: office } : { province };
+    const targetPath = pathFor(rule.to, locale, params);
+    if (!rule.fallback || !rule.officeLookup)
+        return deepFreeze({ action: "redirect", status: 301, targetPath });
+    return deepFreeze({
+        action: "redirect", status: 301, targetPath,
+        fallbackPath: pathFor(rule.fallback, locale, { province }),
+        officeLookup: { page: rule.officeLookup, province, office: office },
+    });
+}
 const RAW_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 function fail(message) {
     throw new Error(`[tiehoy-route-contract] ${message}`);
@@ -192,7 +208,15 @@ export function pathFor(id, locale, params) {
 export function resolveLegacyPath(pathname) {
     if (typeof pathname !== "string" || !pathname.startsWith("/") || /[?#]/.test(pathname))
         return null;
-    for (const legacy of LEGACY_ROUTES) {
+    // Order: exact entries, then rules, then prefix catch-alls (a rule must win over its prefix 404).
+    const ordered = [...LEGACY_ROUTES.filter((r) => r.match !== "prefix"), null, ...LEGACY_ROUTES.filter((r) => r.match === "prefix")];
+    for (const legacy of ordered) {
+        if (legacy === null) {
+            const rule = resolveLegacyPattern(pathname);
+            if (rule)
+                return rule;
+            continue;
+        }
         const matches = legacy.match === "exact"
             ? pathname === legacy.path
             : legacy.match === "exactOrTrailingSlash"
@@ -355,6 +379,19 @@ export function validateManifest() {
     for (const key of Object.keys(ROUTES))
         if (!ROUTE_IDS.includes(key))
             errors.push(`ROUTES contains undeclared route ${JSON.stringify(key)}`);
+    for (const rule of LEGACY_PATTERNS) {
+        const target = ROUTES[rule.to];
+        if (!target)
+            errors.push(`Legacy pattern ${rule.segment} references unknown target`);
+        else if ([...(target.params ?? [])].sort().join() !== [...rule.params].sort().join())
+            errors.push(`Legacy pattern ${rule.segment}/${rule.params.join("/")} params differ from ${rule.to}`);
+        if (rule.fallback && (ROUTES[rule.fallback]?.params ?? []).join() !== "province")
+            errors.push(`Legacy pattern ${rule.segment} fallback must take only province`);
+        if (Boolean(rule.fallback) !== Boolean(rule.officeLookup) || (rule.officeLookup && rule.params.length !== 2))
+            errors.push(`Legacy pattern ${rule.segment} fallback/officeLookup apply to office rules together`);
+        if (rule.allTo && (ROUTES[rule.allTo]?.params ?? []).length)
+            errors.push(`Legacy pattern ${rule.segment} allTo must be static`);
+    }
     for (const legacy of LEGACY_ROUTES) {
         const candidate = legacy;
         if (!candidate.path.startsWith("/"))
