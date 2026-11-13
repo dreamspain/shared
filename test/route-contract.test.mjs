@@ -72,6 +72,12 @@ test("exports the complete source manifest and explicit legacy dispositions", ()
       { match: "exact", path: "/ru/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ru", params: { slug: "tasa-790-012-invitation" } },
       { match: "exact", path: "/zh/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "tasa-790-012-invitation" } },
       { match: "exact", path: "/ar/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "tasa-790-012-invitation" } },
+      { match: "exact", path: "/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "en" },
+      { match: "exact", path: "/es/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "es" },
+      { match: "exact", path: "/fr/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "fr" },
+      { match: "exact", path: "/ru/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "ru" },
+      { match: "exact", path: "/zh/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "zh" },
+      { match: "exact", path: "/ar/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "ar" },
       { match: "exact", path: "/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "en" },
       { match: "prefix", path: "/cita-previa/", action: "notFound", status: 404 },
       { match: "prefix", path: "/es/cita-previa/", action: "notFound", status: 404 },
@@ -309,11 +315,18 @@ test("cita-previa → cita: rules 301 every province/office URL; only unmatched 
   assert.equal(matchRoute("/cita-previa/murcia/"), null, "old prefix is no longer a route");
 });
 
-test("citaAlerts is a noindex static page under /cita/avisos/", () => {
-  assert.equal(pathFor("citaAlerts", "en"), "/cita/avisos/");
-  assert.equal(pathFor("citaAlerts", "es"), "/es/cita/avisos/");
+test("citaAlerts is a noindex static page under /cita/alerts/; /cita/avisos/ 301s in every locale", () => {
+  assert.equal(pathFor("citaAlerts", "en"), "/cita/alerts/");
+  assert.equal(pathFor("citaAlerts", "es"), "/es/cita/alerts/");
   assert.equal(ROUTES.citaAlerts.indexability, "noindex");
   assert.equal(ROUTES.citaAlerts.sitemap, "never");
+  for (const [legacy, target] of [
+    ["/cita/avisos/", "/cita/alerts/"], ["/es/cita/avisos/", "/es/cita/alerts/"], ["/fr/cita/avisos/", "/fr/cita/alerts/"],
+    ["/ru/cita/avisos/", "/ru/cita/alerts/"], ["/zh/cita/avisos/", "/zh/cita/alerts/"], ["/ar/cita/avisos/", "/ar/cita/alerts/"],
+  ]) {
+    assert.deepEqual(resolveLegacyPath(legacy), { action: "redirect", status: 301, targetPath: target });
+  }
+  assert.equal(matchRoute("/cita/alerts/")?.route?.id ?? matchRoute("/cita/alerts/")?.id, "citaAlerts");
 });
 
 test("weekly lote report routes: province report and weekly archive", () => {

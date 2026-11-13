@@ -121,7 +121,7 @@ export const ROUTES: Readonly<Record<RouteId, RouteDefinition>> = deepFreeze({
   citaPrevia: { id: "citaPrevia", kind: "static", slug: "cita", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
   citaPreviaAll: { id: "citaPreviaAll", kind: "static", slug: "cita/all", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
   citaPreviaBook: { id: "citaPreviaBook", kind: "static", slug: "cita/book", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
-  citaAlerts: { id: "citaAlerts", kind: "static", slug: "cita/avisos", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
+  citaAlerts: { id: "citaAlerts", kind: "static", slug: "cita/alerts", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
   citaPreviaProvince: { id: "citaPreviaProvince", kind: "entity", slug: "cita/:province", params: ["province"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", deepLink: false },
   citaProvinceReport: { id: "citaProvinceReport", kind: "entity", slug: "lote/:province/informe", params: ["province"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", scltSlug: "tie/:province/informe", deepLink: false },
   citaWeeklyArchive: { id: "citaWeeklyArchive", kind: "entity", slug: "lote/informe/:week", params: ["week"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", deepLink: false },
@@ -190,6 +190,14 @@ export const LEGACY_ROUTES: readonly LegacyRoute[] = deepFreeze<LegacyRoute[]>([
   { match: "exact", path: "/ru/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ru", params: { slug: "tasa-790-012-invitation" } },
   { match: "exact", path: "/zh/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "tasa-790-012-invitation" } },
   { match: "exact", path: "/ar/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "tasa-790-012-invitation" } },
+  // /cita/avisos/ → /cita/alerts/ (2026-11-13, zhiyi: English slugs like cita/book). Alert mails and Stripe
+  // return URLs carry ?cancel= / ?resume= / ?step=ok: the Worker keeps the query on this redirect.
+  { match: "exact", path: "/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "en" },
+  { match: "exact", path: "/es/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "es" },
+  { match: "exact", path: "/fr/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "fr" },
+  { match: "exact", path: "/ru/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "ru" },
+  { match: "exact", path: "/zh/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "zh" },
+  { match: "exact", path: "/ar/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "ar" },
   // cita-previa → cita (2026-10-28). Province/office URLs now go through LEGACY_PATTERNS (RC10, 2026-11-12);
   // the prefix 404s below only catch what no rule matches.
   { match: "exact", path: "/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "en" },
