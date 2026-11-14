@@ -38,8 +38,8 @@ function throws(fn, message) {
 // The mandated source registry currently declares 33 IDs; this is a
 // fidelity guard so unknown routes are never invented by the producer package.
 test("exports the complete source manifest and explicit legacy dispositions", () => {
-  assert.equal(ROUTE_IDS.length, 40);
-  assert.equal(Object.keys(ROUTES).length, 40);
+  assert.equal(ROUTE_IDS.length, 41);
+  assert.equal(Object.keys(ROUTES).length, 41);
   assert.deepEqual(LOCALES, ["en", "es", "fr", "ru", "zh", "ar"]);
   assert.deepEqual(
     LEGACY_ROUTES,
@@ -72,6 +72,12 @@ test("exports the complete source manifest and explicit legacy dispositions", ()
       { match: "exact", path: "/ru/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ru", params: { slug: "tasa-790-012-invitation" } },
       { match: "exact", path: "/zh/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "tasa-790-012-invitation" } },
       { match: "exact", path: "/ar/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "tasa-790-012-invitation" } },
+      { match: "exact", path: "/tax/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "en" },
+      { match: "exact", path: "/es/impuestos/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "es" },
+      { match: "exact", path: "/fr/tax/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "fr" },
+      { match: "exact", path: "/ru/tax/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "ru" },
+      { match: "exact", path: "/zh/tax/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "zh" },
+      { match: "exact", path: "/ar/tax/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "ar" },
       { match: "exact", path: "/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "en" },
       { match: "exact", path: "/es/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "es" },
       { match: "exact", path: "/fr/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "fr" },
@@ -353,11 +359,23 @@ test("life detail routes: city-code ids, both sides, all locales", () => {
   assert.equal(ROUTES.lifeHaveDetail.sitemap, "entity");
 });
 
-test("hubSelfEmployedTax is a public top-level hub at /tax/ (es /impuestos/)", () => {
-  assert.equal(pathFor("hubSelfEmployedTax", "en"), "/tax/");
-  assert.equal(pathFor("hubSelfEmployedTax", "es"), "/es/impuestos/");
-  assert.equal(pathFor("hubSelfEmployedTax", "zh"), "/zh/tax/");
+test("hubSelfEmployedTax is a public topic at /topics/self-employed-tax/ (es /topics/autonomos-impuestos/)", () => {
+  assert.equal(pathFor("hubSelfEmployedTax", "en"), "/topics/self-employed-tax/");
+  assert.equal(pathFor("hubSelfEmployedTax", "es"), "/es/topics/autonomos-impuestos/");
+  assert.equal(pathFor("hubSelfEmployedTax", "zh"), "/zh/topics/self-employed-tax/");
   assert.equal(ROUTES.hubSelfEmployedTax.indexability, "indexable");
   assert.equal(ROUTES.hubSelfEmployedTax.sitemap, "static");
   assert.equal(ROUTES.hubSelfEmployedTax.deepLink, false);
+  for (const [path, locale] of [["/tax/", "en"], ["/es/impuestos/", "es"], ["/fr/tax/", "fr"], ["/ru/tax/", "ru"], ["/zh/tax/", "zh"], ["/ar/tax/", "ar"]]) {
+    const rule = LEGACY_ROUTES.find(r => r.path === path);
+    assert.ok(rule && rule.status === 301 && rule.to === "hubSelfEmployedTax" && rule.locale === locale, path);
+  }
+});
+
+test("pricing is an indexable static page at /pricing/ (es /precios/)", () => {
+  assert.equal(pathFor("pricing", "en"), "/pricing/");
+  assert.equal(pathFor("pricing", "es"), "/es/precios/");
+  assert.equal(pathFor("pricing", "ar"), "/ar/pricing/");
+  assert.equal(ROUTES.pricing.indexability, "indexable");
+  assert.equal(ROUTES.pricing.sitemap, "static");
 });

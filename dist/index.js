@@ -13,7 +13,7 @@ export const LOCALES = deepFreeze(["en", "es", "fr", "ru", "zh", "ar"]);
 export const ROUTE_IDS = deepFreeze([
     "home", "lote", "loteCheck", "loteNotify", "loteNotifyConfirmed", "loteProvince", "loteOffice",
     "citaPrevia", "citaPreviaAll", "citaPreviaBook", "citaAlerts", "citaPreviaProvince",
-    "citaProvinceReport", "citaWeeklyArchive", "citaPreviaOffice",
+    "citaProvinceReport", "citaWeeklyArchive", "citaPreviaOffice", "pricing",
     "pausedOffices", "topicsIndex", "hubTieCardRenewal", "hubResidenceRenewal",
     "hubFamilyReunification", "hubInvitationLetter", "hubClave", "hubSelfEmployedTax", "guidesIndex", "guideDetail",
     "invitesIndex", "inviteDetail", "mentorsIndex", "lifeIndex", "lifeHave", "lifeNeed",
@@ -48,7 +48,7 @@ export const ROUTES = deepFreeze({
     hubFamilyReunification: { id: "hubFamilyReunification", kind: "static", slug: "topics/family-reunification", esSlug: "topics/reagrupacion-familiar", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: true },
     hubInvitationLetter: { id: "hubInvitationLetter", kind: "static", slug: "topics/invitation-letter", esSlug: "topics/carta-de-invitacion", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: true },
     hubClave: { id: "hubClave", kind: "static", slug: "topics/clave", esSlug: "topics/clave", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: true },
-    hubSelfEmployedTax: { id: "hubSelfEmployedTax", kind: "static", slug: "tax", esSlug: "impuestos", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
+    hubSelfEmployedTax: { id: "hubSelfEmployedTax", kind: "static", slug: "topics/self-employed-tax", esSlug: "topics/autonomos-impuestos", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     guidesIndex: { id: "guidesIndex", kind: "static", slug: "guides", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: true },
     guideDetail: { id: "guideDetail", kind: "entity", slug: "guides/:slug", params: ["slug"], activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "entity", deepLink: true },
     invitesIndex: { id: "invitesIndex", kind: "static", slug: "invites", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
@@ -64,6 +64,8 @@ export const ROUTES = deepFreeze({
     cookies: { id: "cookies", kind: "static", slug: "cookies", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     terms: { id: "terms", kind: "static", slug: "terms", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     legalNotice: { id: "legalNotice", kind: "static", slug: "legal-notice", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
+    // Price board for every paid service (zhiyi 2026-11-14): main nav entry after Lote.
+    pricing: { id: "pricing", kind: "static", slug: "pricing", esSlug: "precios", activeLocales: ALL_LOCALES, indexability: "indexable", sitemap: "static", deepLink: false },
     contact: { id: "contact", kind: "static", slug: "contact", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
     construction: { id: "construction", kind: "static", slug: "construction", activeLocales: ALL_LOCALES, indexability: "noindex", sitemap: "never", deepLink: false },
 });
@@ -104,6 +106,13 @@ export const LEGACY_ROUTES = deepFreeze([
     { match: "exact", path: "/ru/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ru", params: { slug: "tasa-790-012-invitation" } },
     { match: "exact", path: "/zh/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "tasa-790-012-invitation" } },
     { match: "exact", path: "/ar/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "tasa-790-012-invitation" } },
+    // /tax/ → /topics/self-employed-tax/ (2026-11-14, zhiyi: tax is a topic; its main-nav slot goes to Pricing).
+    { match: "exact", path: "/tax/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "en" },
+    { match: "exact", path: "/es/impuestos/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "es" },
+    { match: "exact", path: "/fr/tax/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "fr" },
+    { match: "exact", path: "/ru/tax/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "ru" },
+    { match: "exact", path: "/zh/tax/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "zh" },
+    { match: "exact", path: "/ar/tax/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "ar" },
     // /cita/avisos/ → /cita/alerts/ (2026-11-13, zhiyi: English slugs like cita/book). Alert mails and Stripe
     // return URLs carry ?cancel= / ?resume= / ?step=ok: the Worker keeps the query on this redirect.
     { match: "exact", path: "/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "en" },
