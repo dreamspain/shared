@@ -24,6 +24,12 @@
   --tie-seal: #8a3f31;
   --tie-orchid: #76506c;
 
+  /* Freshness — the data day's lag on the freshness ribbon (sclt.es/tie/ rule: expected day / late / 3+ days),
+     text on paper ≥ 4.5:1; the green is one step darker than sclt's #059669 (3.6:1) to clear it. */
+  --tie-fresh: #047857;
+  --tie-late: #b45309;
+  --tie-stale: #dc2626;
+
   /* Type (§3: serif upright = fact, small caps sans = label, italic serif numeral = chapter) */
   --tie-serif: Georgia, "Times New Roman", serif;
   --tie-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Arial, sans-serif;
