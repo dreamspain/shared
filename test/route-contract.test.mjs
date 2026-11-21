@@ -85,6 +85,11 @@ test("exports the complete source manifest and explicit legacy dispositions", ()
       { match: "exact", path: "/zh/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "zh" },
       { match: "exact", path: "/ar/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "ar" },
       { match: "exact", path: "/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "en" },
+      { match: "exact", path: "/es/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "es" },
+      { match: "exact", path: "/fr/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "fr" },
+      { match: "exact", path: "/ru/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "ru" },
+      { match: "exact", path: "/zh/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "zh" },
+      { match: "exact", path: "/ar/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "ar" },
       { match: "prefix", path: "/cita-previa/", action: "notFound", status: 404 },
       { match: "prefix", path: "/es/cita-previa/", action: "notFound", status: 404 },
       { match: "prefix", path: "/fr/cita-previa/", action: "notFound", status: 404 },
@@ -313,7 +318,12 @@ test("cita-previa → cita: rules 301 every province/office URL; only unmatched 
   });
   assert.deepEqual(resolveLegacyPath("/cita-previa/"), { action: "redirect", status: 301, targetPath: "/cita/" });
   assert.deepEqual(resolveLegacyPath("/fr/cita-previa/all/"), { action: "redirect", status: 301, targetPath: "/fr/cita/all/" });
-  assert.deepEqual(resolveLegacyPath("/es/cita-previa/"), { action: "notFound", status: 404 });
+  // Every locale of the old hub 301s, as RC10 made every province/office URL do (was 404 from the 10-28 GSC snapshot).
+  assert.deepEqual(resolveLegacyPath("/es/cita-previa/"), { action: "redirect", status: 301, targetPath: "/es/cita/" });
+  assert.deepEqual(resolveLegacyPath("/fr/cita-previa/"), { action: "redirect", status: 301, targetPath: "/fr/cita/" });
+  assert.deepEqual(resolveLegacyPath("/ru/cita-previa/"), { action: "redirect", status: 301, targetPath: "/ru/cita/" });
+  assert.deepEqual(resolveLegacyPath("/zh/cita-previa/"), { action: "redirect", status: 301, targetPath: "/zh/cita/" });
+  assert.deepEqual(resolveLegacyPath("/ar/cita-previa/"), { action: "redirect", status: 301, targetPath: "/ar/cita/" });
   assert.deepEqual(resolveLegacyPath("/zh/cita-previa/madrid/getafe/"), {
     action: "redirect", status: 301, targetPath: "/zh/lote/madrid/getafe/",
     fallbackPath: "/zh/lote/madrid/", officeLookup: { page: "lote", province: "madrid", office: "getafe" },

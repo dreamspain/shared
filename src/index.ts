@@ -210,6 +210,13 @@ export const LEGACY_ROUTES: readonly LegacyRoute[] = deepFreeze<LegacyRoute[]>([
   // cita-previa → cita (2026-10-28). Province/office URLs now go through LEGACY_PATTERNS (RC10, 2026-11-12);
   // the prefix 404s below only catch what no rule matches.
   { match: "exact", path: "/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "en" },
+  // The hub's other locales were live at the same slug until 10-28 and are still crawled (CF logs 11-18..21:
+  // Googlebot /es/ and /zh/); without these they fell into the prefix 404s below.
+  { match: "exact", path: "/es/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "es" },
+  { match: "exact", path: "/fr/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "fr" },
+  { match: "exact", path: "/ru/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "ru" },
+  { match: "exact", path: "/zh/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "zh" },
+  { match: "exact", path: "/ar/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "ar" },
   { match: "prefix", path: "/cita-previa/", action: "notFound", status: 404 },
   { match: "prefix", path: "/es/cita-previa/", action: "notFound", status: 404 },
   { match: "prefix", path: "/fr/cita-previa/", action: "notFound", status: 404 },
