@@ -192,6 +192,20 @@ export const LEGACY_ROUTES: readonly LegacyRoute[] = deepFreeze<LegacyRoute[]>([
   { match: "exact", path: "/ru/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ru", params: { slug: "tasa-790-012-invitation" } },
   { match: "exact", path: "/zh/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "tasa-790-012-invitation" } },
   { match: "exact", path: "/ar/guides/tasa_790_012_invitation/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "tasa-790-012-invitation" } },
+  // 2026-10-31 student-to-work guides merged into student-to-work-spain (94477a79); GSC 28d impressions>0 on
+  // ar/fr student-to-work-modification and ru student-to-work-permit-spain (元要求 §三.3 301 rule).
+  { match: "exact", path: "/guides/student-to-work-modification/", action: "redirect", status: 301, to: "guideDetail", locale: "en", params: { slug: "student-to-work-spain" } },
+  { match: "exact", path: "/es/guides/student-to-work-modification/", action: "redirect", status: 301, to: "guideDetail", locale: "es", params: { slug: "student-to-work-spain" } },
+  { match: "exact", path: "/fr/guides/student-to-work-modification/", action: "redirect", status: 301, to: "guideDetail", locale: "fr", params: { slug: "student-to-work-spain" } },
+  { match: "exact", path: "/ru/guides/student-to-work-modification/", action: "redirect", status: 301, to: "guideDetail", locale: "ru", params: { slug: "student-to-work-spain" } },
+  { match: "exact", path: "/zh/guides/student-to-work-modification/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "student-to-work-spain" } },
+  { match: "exact", path: "/ar/guides/student-to-work-modification/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "student-to-work-spain" } },
+  { match: "exact", path: "/guides/student-to-work-permit-spain/", action: "redirect", status: 301, to: "guideDetail", locale: "en", params: { slug: "student-to-work-spain" } },
+  { match: "exact", path: "/es/guides/student-to-work-permit-spain/", action: "redirect", status: 301, to: "guideDetail", locale: "es", params: { slug: "student-to-work-spain" } },
+  { match: "exact", path: "/fr/guides/student-to-work-permit-spain/", action: "redirect", status: 301, to: "guideDetail", locale: "fr", params: { slug: "student-to-work-spain" } },
+  { match: "exact", path: "/ru/guides/student-to-work-permit-spain/", action: "redirect", status: 301, to: "guideDetail", locale: "ru", params: { slug: "student-to-work-spain" } },
+  { match: "exact", path: "/zh/guides/student-to-work-permit-spain/", action: "redirect", status: 301, to: "guideDetail", locale: "zh", params: { slug: "student-to-work-spain" } },
+  { match: "exact", path: "/ar/guides/student-to-work-permit-spain/", action: "redirect", status: 301, to: "guideDetail", locale: "ar", params: { slug: "student-to-work-spain" } },
   // /tax/ → /topics/self-employed-tax/ (2026-11-14, zhiyi: tax is a topic; its main-nav slot goes to Pricing).
   { match: "exact", path: "/tax/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "en" },
   { match: "exact", path: "/es/impuestos/", action: "redirect", status: 301, to: "hubSelfEmployedTax", locale: "es" },
