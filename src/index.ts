@@ -221,6 +221,14 @@ export const LEGACY_ROUTES: readonly LegacyRoute[] = deepFreeze<LegacyRoute[]>([
   { match: "exact", path: "/ru/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "ru" },
   { match: "exact", path: "/zh/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "zh" },
   { match: "exact", path: "/ar/cita/avisos/", action: "redirect", status: 301, to: "citaAlerts", locale: "ar" },
+  // /lote/alert/ → /lote/notify/ (2026-11-24, zhiyi: the lote alert product is called «alert» on pricing and in
+  // conversation; the page keeps its notify slug). Query kept by the Worker, like /cita/avisos/.
+  { match: "exact", path: "/lote/alert/", action: "redirect", status: 301, to: "loteNotify", locale: "en" },
+  { match: "exact", path: "/es/lote/alert/", action: "redirect", status: 301, to: "loteNotify", locale: "es" },
+  { match: "exact", path: "/fr/lote/alert/", action: "redirect", status: 301, to: "loteNotify", locale: "fr" },
+  { match: "exact", path: "/ru/lote/alert/", action: "redirect", status: 301, to: "loteNotify", locale: "ru" },
+  { match: "exact", path: "/zh/lote/alert/", action: "redirect", status: 301, to: "loteNotify", locale: "zh" },
+  { match: "exact", path: "/ar/lote/alert/", action: "redirect", status: 301, to: "loteNotify", locale: "ar" },
   // cita-previa → cita (2026-10-28). Province/office URLs now go through LEGACY_PATTERNS (RC10, 2026-11-12);
   // the prefix 404s below only catch what no rule matches.
   { match: "exact", path: "/cita-previa/", action: "redirect", status: 301, to: "citaPrevia", locale: "en" },
