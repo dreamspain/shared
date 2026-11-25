@@ -587,3 +587,51 @@ export const registryVersion = `sha256:${sha256Hex(stableStringify(registryConte
 export function toJSON() {
     return deepFreeze({ version: registryVersion, ...registryContent() });
 }
+// ── Tracking contract ───────────────────────────────────────────────
+// One list shared by the sender (tiehoy pages, app/lib/track.ts) and the receiver (tie-api /api/page-beacon).
+// Before this, each side kept its own copy and a beacon the receiver did not list was rejected with a 400
+// nobody saw (cita ad slots, 11-13..11-24).
+/**
+ * Visit cookie, set by the page itself (first-party, the site's registrable domain, 30-minute sliding window)
+ * before its first beacon. Every request of the visit (beacons, checkout POSTs) then carries the same id; a
+ * server-minted id raced itself when a new visitor's first beacons went out together.
+ */
+export const TRACKING_SESSION_COOKIE = "tiehoy_sid";
+export const TRACKING_SESSION_MAX_AGE_S = 30 * 60;
+/** Every event a page may beacon, with the surface the receiver records it under. */
+export const BEACON_EVENTS = deepFreeze({
+    page_view: "page",
+    checkout_view: "checkout",
+    checkout_plan_select: "checkout",
+    checkout_submit: "checkout",
+    checkout_return: "checkout",
+    tie_hub_view: "hub",
+    tie_check_view: "check",
+    tie_subscribe_view: "subscribe",
+    lang_switch: "province",
+    tie_notify_cta_view: "subscribe",
+    tie_notify_cta_click: "subscribe",
+    tie_notify_checkout_view: "subscribe",
+    tie_notify_prefill_ok: "subscribe",
+    tie_notify_prefill_fail: "subscribe",
+    tie_notify_plan_select: "subscribe",
+    tie_notify_checkout_submit: "subscribe",
+    tie_notify_payment_redirect: "payment",
+    tie_notify_manual_destination_view: "payment",
+});
+export const BEACON_PRODUCTS = deepFreeze(["notify", "book", "cita_alerts"]);
+/**
+ * Purchase entries: any link to one of these routes, on any page, is an offer entry whose exposure and click
+ * are recorded with the product it sells. A new product's checkout route is added here once.
+ */
+export const OFFER_ENTRY_ROUTES = deepFreeze({
+    loteNotify: "notify",
+    citaPreviaBook: "book",
+    citaAlerts: "cita_alerts",
+});
+/**
+ * Offer-entry events for every product; the product travels in the beacon. The names predate the other
+ * products (journey.stage_map reads them as see_offer / click_offer): a product-neutral name needs a rebuild
+ * of the D1 event table's CHECK, deferred until that table is trimmed to its retention window.
+ */
+export const OFFER_CTA_EVENTS = deepFreeze({ view: "tie_notify_cta_view", click: "tie_notify_cta_click" });

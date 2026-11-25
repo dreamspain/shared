@@ -133,3 +133,53 @@ export interface RouteRegistryJSON {
 /** Stable SHA-256 of the JSON-exported route content, never date-derived. */
 export declare const registryVersion: string;
 export declare function toJSON(): RouteRegistryJSON;
+/**
+ * Visit cookie, set by the page itself (first-party, the site's registrable domain, 30-minute sliding window)
+ * before its first beacon. Every request of the visit (beacons, checkout POSTs) then carries the same id; a
+ * server-minted id raced itself when a new visitor's first beacons went out together.
+ */
+export declare const TRACKING_SESSION_COOKIE = "tiehoy_sid";
+export declare const TRACKING_SESSION_MAX_AGE_S: number;
+export type BeaconSurface = "page" | "checkout" | "hub" | "check" | "subscribe" | "province" | "payment";
+/** Every event a page may beacon, with the surface the receiver records it under. */
+export declare const BEACON_EVENTS: {
+    readonly page_view: "page";
+    readonly checkout_view: "checkout";
+    readonly checkout_plan_select: "checkout";
+    readonly checkout_submit: "checkout";
+    readonly checkout_return: "checkout";
+    readonly tie_hub_view: "hub";
+    readonly tie_check_view: "check";
+    readonly tie_subscribe_view: "subscribe";
+    readonly lang_switch: "province";
+    readonly tie_notify_cta_view: "subscribe";
+    readonly tie_notify_cta_click: "subscribe";
+    readonly tie_notify_checkout_view: "subscribe";
+    readonly tie_notify_prefill_ok: "subscribe";
+    readonly tie_notify_prefill_fail: "subscribe";
+    readonly tie_notify_plan_select: "subscribe";
+    readonly tie_notify_checkout_submit: "subscribe";
+    readonly tie_notify_payment_redirect: "payment";
+    readonly tie_notify_manual_destination_view: "payment";
+};
+export type BeaconEvent = keyof typeof BEACON_EVENTS;
+export declare const BEACON_PRODUCTS: readonly ["notify", "book", "cita_alerts"];
+export type BeaconProduct = (typeof BEACON_PRODUCTS)[number];
+/**
+ * Purchase entries: any link to one of these routes, on any page, is an offer entry whose exposure and click
+ * are recorded with the product it sells. A new product's checkout route is added here once.
+ */
+export declare const OFFER_ENTRY_ROUTES: {
+    readonly loteNotify: "notify";
+    readonly citaPreviaBook: "book";
+    readonly citaAlerts: "cita_alerts";
+};
+/**
+ * Offer-entry events for every product; the product travels in the beacon. The names predate the other
+ * products (journey.stage_map reads them as see_offer / click_offer): a product-neutral name needs a rebuild
+ * of the D1 event table's CHECK, deferred until that table is trimmed to its retention window.
+ */
+export declare const OFFER_CTA_EVENTS: {
+    readonly view: "tie_notify_cta_view";
+    readonly click: "tie_notify_cta_click";
+};
