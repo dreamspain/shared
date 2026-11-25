@@ -24,6 +24,13 @@
   --tie-seal: #8a3f31;
   --tie-orchid: #76506c;
 
+  /* Procedure colors (zhiyi apply 2026-11-25): the same procedure reads in the same color wherever its name appears
+     (tabs, rows, galaxy). Text colors: each clears 4.5:1 on --tie-paper (6.8 / 6.0 / 5.7). Not accents: never a
+     background, never a CTA. Other procedures stay --tie-ink. */
+  --tie-biz-fingerprints: #2f5d7c;
+  --tie-biz-collection: #3d6b45;
+  --tie-biz-letter: #8a5a14;
+
   /* Freshness — the data day's lag on the freshness ribbon (sclt.es/tie/ rule: expected day / late / 3+ days),
      text on paper ≥ 4.5:1; the green is one step darker than sclt's #059669 (3.6:1) to clear it. */
   --tie-fresh: #047857;
